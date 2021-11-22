@@ -849,11 +849,24 @@ html;
             $trabaja_seguridad = "NO";
         }
 
-
-
-
+    $tabla_economicos = '';
     $dias_economicos = ColaboradoresDao::getAllDiasEconomicos($id);
-    $otros_datos = ColaboradoresDao::getOtrosDatosPersonales($id);
+    if(empty($dias_economicos['dias_sobrantes']))
+    {
+        $tabla_economicos.=<<<html
+            <input type="text" class="form-control" value="NO DISPONIBLE PARA ADMINISTRATIVOS" disabled>
+html;
+    }
+    else
+    {
+        $tabla_economicos.=<<<html
+            <input type="text" class="form-control" value="{$dias_economicos['dias_sobrantes']} días" disabled>
+html;
+    }
+
+
+
+        $otros_datos = ColaboradoresDao::getOtrosDatosPersonales($id);
     $editarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 5)==1)?  "" : "style=\"display:none;\"";
     $eliminarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 6)==1)? "" : "style=\"display:none;\"";
     $tabla= '';
@@ -876,6 +889,24 @@ html;
 html;
     }
 
+    $estado_civil_combo = ColaboradoresDao::getByIdOtro($id);
+
+        $sOtros = "";
+        foreach (ColaboradoresDao::getEstadoCivil() as $key => $value) {
+            $selected = ($estado_civil_combo['estado_civil']==$value['id_estado_civil'])? 'selected' : '';
+            $sOtros .=<<<html
+        <option {$selected} value="{$value['id_estado_civil']}">{$value['descripcion']}</option>
+html;
+        }
+
+        $sUltimoGradoEstudios = "";
+        foreach (ColaboradoresDao::getUltimoGradoEstudios() as $key => $value) {
+            $selected = ($estado_civil_combo['ultimo_grado_estudios']==$value['id_ultimo_grado_estudios'])? 'selected' : '';
+            $sUltimoGradoEstudios.=<<<html
+        <option {$selected} value="{$value['id_ultimo_grado_estudios']}">{$value['descripcion']}</option>
+html;
+        }
+
     $pdfHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 2)==1)?  "" : "style=\"display:none;\"";
     $excelHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 3)==1)? "" : "style=\"display:none;\"";
     $agregarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 4)==1)? "" : "style=\"display:none;\"";
@@ -884,12 +915,13 @@ html;
     View::set('agregarHidden',$agregarHidden);
     View::set('editarHidden',$editarHidden);
     View::set('eliminarHidden',$eliminarHidden);
-    View::set('dias_economicos',$dias_economicos);
+    View::set('tabla_economicos',$tabla_economicos);
     View::set('accidentes',$accidentes);
     View::set('trabaja_seguridad',$trabaja_seguridad);
     View::set('accidentes_count',$accidentes_count);
     View::set('incapacidades_count',$incapacidades_count);
     View::set('tabla',$tabla);
+    View::set('sOtros',$sOtros);
 
     $colaborador = ColaboradoresDao::getById($id);
 
@@ -1050,25 +1082,34 @@ html;
         }
 
         foreach (ColaboradoresDao::getDomicilios($id) as $key => $value) {
+            $delete_domicilio = $value['id_domicilio'];
             $tabla2.=<<<html
                 <tr>
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_domicilio']}"/></td>
                     <td> {$value['direccion']} </td>
-                    <td class="center" >
-                        <button type="button" class="btn btn-success"><span class="fa fa-edit" style="color:white"></span></button>
+                    <td class="center" > 
+                        <button class="btn btn-danger" type="button" id="button" onclick="eliminar_domicilio($delete_domicilio)"><span class="fa fa-trash" style="color:white"></button>
                     </td>
                 </tr>
 html;
         }
         foreach (ColaboradoresDao::getNumeroHijos($id) as $key => $value) {
+            $delete_hijos = $value['id_numero_hijos'];
+
+            $firstDate  = new \DateTime($value['fecha_nacimiento']);
+            $secondDate = new \DateTime(date("Y") . "-" . date("m") . "-" . date("d"));
+            $intvl = $firstDate->diff($secondDate);
+            $fecha = $intvl->y . " año(s), " . $intvl->m." mes(es) y ".$intvl->d." dia(s)";
+
             $tabla3.=<<<html
-                <tr>
+                <tr>   
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_numero_hijos']}"/></td>
                     <td> {$value['ocupacion']} </td>
-                    <td> {$value['fecha_nacimiento']} </td>
-                    <td> {$value['genero']} </td>
-                    <td class="center" >
-                        <button type="button" class="btn btn-success"><span class="fa fa-edit" style="color:white"></span></button>
+                    <td> {$value['fecha_nacimiento']} </td>    
+                    <td> $fecha </td>      
+                    <td> {$value['genero']} </td>    
+                    <td class="center" > 
+                        <button class="btn btn-danger" type="button" id="button" onclick="eliminar_hijos($delete_hijos)"><span class="fa fa-trash" style="color:white"></button>
                     </td>
                 </tr>
 html;
@@ -1155,7 +1196,8 @@ html;
       View::set('otros_datos', $otros_datos);
       View::set('sArchivos',$sArchivos);
       View::set('sDocu',$sDocu);
-      View::set('sOcupacion',$sOcupacion);      
+      View::set('sOcupacion',$sOcupacion);
+      View::set('sUltimoGradoEstudios',$sUltimoGradoEstudios);
       View::set('DatoUltimoCurso',$DatoUltimoCurso);
       View::set('DatoPorcentaje',$DatoPorcentaje);
       View::set('sGeneros',$sGeneros);
@@ -1184,6 +1226,21 @@ html;
         if($id >= 1){
             echo 'success';
 
+        } else {
+            echo 'No se actualizo nada';
+        }
+
+    }
+
+    public function OtrosDatosPersonalesEdit(){
+        $OtrosDatosPersonales = new \stdClass();
+        $OtrosDatosPersonales->_catalogo_colaboradores_id = MasterDom::getData('id_colaborador_datos_personales');
+        $OtrosDatosPersonales->_estado_civil = MasterDom::getData('estado_civil');
+        $OtrosDatosPersonales->_ultimo_grado = MasterDom::getData('ultimo_grado');
+
+        $id = ColaboradoresDao::updateOtrosDatosPersonales($OtrosDatosPersonales);
+        if($id >= 1){
+            echo 'success';
         } else {
             echo 'No se actualizo nada';
         }
@@ -1230,12 +1287,30 @@ html;
 
     }
 
+    public function DomicilioAdd(){
+        $domicilio = new \stdClass();
+        $domicilio->_id_colaborador = MasterDom::getData('id_colaborador_domicilio');
+
+        $domicilio_descripcion = MasterDom::getDataAll('domicilio');
+        $domicilio_descripcion = MasterDom::procesoAcentosNormal($domicilio_descripcion);
+        $domicilio->_descripcion = $domicilio_descripcion;
+
+        $id = ColaboradoresDao::insertExtraDomicilio($domicilio);
+        if($id >= 1){
+            echo 'success';
+
+        } else {
+            echo 'No se actualizo nada';
+        }
+
+    }
+
     public function HijosAdd(){
         $hijos = new \stdClass();
         $hijos->_id_colaborador = MasterDom::getData('id_colaborador_hijos');
 
         $hijos->_ocupacion = MasterDom::getData('ocupacion');
-        $hijos->_nacimiento = MasterDom::getData('nacimiento');
+        $hijos->_nacimiento_fecha = MasterDom::getData('nacimiento_fecha');
         $hijos->_genero = MasterDom::getData('genero');
 
         $id = ColaboradoresDao::insertExtraHijos($hijos);
@@ -1905,6 +1980,32 @@ html;
             {
                 echo "fail";
             }
+    }
+
+    public function Delete_Hijos(){
+        $dato = ColaboradoresDao::delete_hijos($_POST['a']);
+
+        if($dato >= 1)
+        {
+            echo "true";
+        }
+        else
+        {
+            echo "fail";
+        }
+    }
+
+    public function Delete_Domicilio(){
+        $dato = ColaboradoresDao::delete_domicilio($_POST['a']);
+
+        if($dato >= 1)
+        {
+            echo "true";
+        }
+        else
+        {
+            echo "fail";
+        }
     }
 
 }

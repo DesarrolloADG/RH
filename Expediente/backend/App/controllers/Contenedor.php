@@ -155,6 +155,15 @@ $menu.=<<<html
                     </li>
 html;
 
+        $menu.=<<<html
+                    <li {$mostrar}><a a href="/Competencias/">Catalogo Competencias</a>
+                      
+                    </li>
+html;
+
+
+
+
 $menu.=<<<html
                     
 </ul>

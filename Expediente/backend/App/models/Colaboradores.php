@@ -63,7 +63,7 @@ sql;
     public static function getDomicilios($id){
         $mysqli = Database::getInstance();
         $query=<<<sql
-        SELECT id_domicilio,CONCAT(calle, ", ", exterior ,", ", interior, ", ",colonia, ", ", cp, ", ",municipio, ", ", estado) AS direccion FROM domicilios where catalogo_colaboradores_id = $id;
+        SELECT id_domicilio, descripcion AS direccion FROM domicilios where catalogo_colaboradores_id = $id;
 
 sql;
         return $mysqli->queryAll($query);
@@ -72,8 +72,10 @@ sql;
     public static function getNumeroHijos($id){
         $mysqli = Database::getInstance();
         $query=<<<sql
-        SELECT  from numero_hijos 
-        where catalogo_colaboradores_id = $id;
+        SELECT nh.id_numero_hijos, o.nombre AS ocupacion, nh.fecha_nacimiento, g.nombre AS genero FROM numero_hijos nh
+ INNER JOIN ocupacion o ON nh.ocupacion = o.id_ocupacion
+ INNER JOIN genero g ON nh.genero= g.id_genero  
+ WHERE catalogo_colaboradores_id = $id;
 
 sql;
         return $mysqli->queryAll($query);
@@ -549,6 +551,28 @@ sql;
         return $mysqli->update($query, $parametros);
     }
 
+    public static function updateOtrosDatosPersonales($otros_datos_personales){
+        $mysqli = Database::getInstance(true);
+        $query=<<<sql
+      UPDATE otros_datos_personales SET
+        estado_civil = :estado_civil,
+        ultimo_grado_estudios = :ultimo_grado_estudios
+      WHERE catalogo_colaboradores_id = :catalogo_colaboradores_id   
+sql;
+        $parametros = array(
+            ':estado_civil' => $otros_datos_personales->_estado_civil,
+            ':ultimo_grado_estudios' => $otros_datos_personales->_ultimo_grado,
+            ':catalogo_colaboradores_id' => $otros_datos_personales->_catalogo_colaboradores_id
+        );
+
+        $accion = new \stdClass();
+        $accion->_sql= $query;
+        $accion->_parametros = $parametros;
+        $accion->_id = $otros_datos_personales->_catalogo_colaboradores_id;
+        UtileriasLog::addAccion($accion);
+        return $mysqli->update($query, $parametros);
+    }
+
     public static function updateIncentivo($incentivo){
         $mysqli = Database::getInstance(true);
         $query=<<<sql
@@ -585,6 +609,22 @@ sql;
         return $mysqli->delete($query);
     }
 
+    public static function delete_domicilio($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      delete from domicilios WHERE id_domicilio = $id
+sql;
+        return $mysqli->delete($query);
+    }
+
+    public static function delete_hijos($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      delete from numero_hijos WHERE id_numero_hijos = $id
+sql;
+        return $mysqli->delete($query);
+    }
+
     public static function files($id){
         $mysqli = Database::getInstance();
         $query=<<<sql
@@ -605,6 +645,17 @@ sql;
       WHERE c.catalogo_colaboradores_id = $id
 sql;
       return $mysqli->queryOne($query);
+    }
+
+    public static function getByIdOtro($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      SELECT
+        *    
+      FROM otros_datos_personales
+      WHERE catalogo_colaboradores_id = $id
+sql;
+        return $mysqli->queryOne($query);
     }
 
     public static function getByIdReporte($id){
@@ -739,12 +790,26 @@ sql;
       return $mysqli->insert($query);
     }
 
+    public static function insertExtraDomicilio($estudios){
+
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      INSERT INTO domicilios
+      VALUES (null, $estudios->_id_colaborador, '$estudios->_descripcion');
+sql;
+        $accion = new \stdClass();
+        $accion->_sql= $query;
+        $accion->_parametros = $parametros;
+        UtileriasLog::addAccion($accion);
+        return $mysqli->insert($query);
+    }
+
     public static function insertExtraHijos($hijos){
 
         $mysqli = Database::getInstance();
         $query=<<<sql
       INSERT INTO numero_hijos
-      VALUES (null, $hijos->_id_colaborador, $hijos->_ocupacion, $hijos->_nacimiento, $hijos->_genero);
+      VALUES (null, $hijos->_id_colaborador, $hijos->_ocupacion, '$hijos->_nacimiento_fecha', $hijos->_genero);
 sql;
         $accion = new \stdClass();
         $accion->_sql= $query;
@@ -815,6 +880,15 @@ sql;
         return $mysqli->queryAll($query);
     }
 
+    public static function getUltimoGradoEstudios(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT *
+  FROM ultimo_grado_estudios
+sql;
+        return $mysqli->queryAll($query);
+    }
+
     public static function getGenero(){
         $mysqli = Database::getInstance();
         $query=<<<sql
@@ -842,10 +916,22 @@ sql;
         return $mysqli->queryOne($query);
     }
 
+    public static function getEstadoCivil(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT *
+  FROM estado_civil
+sql;
+        return $mysqli->queryAll($query);
+    }
+
     public static function getOtrosDatosPersonales($id){
         $mysqli = Database::getInstance();
         $query=<<<sql
-       SELECT * FROM otros_datos_personales WHERE catalogo_colaboradores_id = $id
+       SELECT uge.descripcion as ultimo_grado_estudios, ec.descripcion as estado_civil FROM otros_datos_personales odp
+       INNER JOIN estado_civil ec ON odp.estado_civil = ec.id_estado_civil
+       INNER JOIN ultimo_grado_estudios uge ON odp.ultimo_grado_estudios = uge.id_ultimo_grado_estudios
+       WHERE catalogo_colaboradores_id = $id
 
 sql;
         return $mysqli->queryOne($query);
@@ -864,7 +950,7 @@ sql;
 
         $mysqli = Database::getInstance();
         $query=<<<sql
-SELECT * FROM dias_economicos_view WHERE id_colaborador = $id ORDER BY nombre ASC
+SELECT * FROM dias_economicos_view WHERE id_colaborador = $id AND pago= 'Semanal' ORDER BY nombre ASC
 
 sql;
         return $mysqli->queryOne($query);

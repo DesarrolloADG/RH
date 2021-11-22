@@ -232,9 +232,9 @@
                                             <label>MONTO DE SU INCENTIVO TRIMESTRAL:</label>
                                             <input id="monto_trimestral" type="text" class="form-control" value="<?php echo $incentivo_trimestral['monto']; ?>"disabled>
                                         </div>
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-12">
                                             <label>DÍAS ECONÓMICOS RESTANTES POR DISFRUTAR: </label>
-                                            <input type="text" class="form-control" value="<?php echo $dias_economicos['dias_sobrantes']; ?> días" disabled>
+                                            <?php echo $tabla_economicos; ?>
                                         </div>
                                     </div>
                                     <div class="col-md-6 subir-archivos">
@@ -285,11 +285,11 @@
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>ESTADO CIVIL: </label>
-                                            <input type="text" class="form-control" value="<?php echo $otros_datos['estado_civil']; ?>" disabled>
+                                            <input type="text" class="form-control" id="id_estado_civil" value="<?php echo $otros_datos['estado_civil']; ?>" disabled>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>ULTIMO GRADO DE ESTUDIOS: </label>
-                                            <input type="text" class="form-control" value="<?php echo $otros_datos['ultimo_grado_estudios']; ?>" disabled>
+                                            <input type="text" class="form-control" id="id_ultimo_grado" value="<?php echo $otros_datos['ultimo_grado_estudios']; ?>" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-6 subir-archivos">
@@ -340,6 +340,7 @@
                                                                 <th><input type="checkbox" name="checkAll" id="checkAll" value=""/></th>
                                                                 <th>Ocupación</th>
                                                                 <th>Fecha de Nacimiento</th>
+                                                                <th>Edad</th>
                                                                 <th>Genero</th>
                                                                 <th>Acciones</th>
                                                             </tr>
@@ -842,7 +843,7 @@
                                     <form enctype="multipart/form-data" id="form_ingreso_proyecto">
 
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="id_ingreso_proyecto" name="id_ingreso_proyecto" value="<?php echo $ingreso_proyecto['id_ingreso']; ?>">
+                                            <input type="hidden" class="form-control" id="id_ingreso_proyecto" name="id_ingreso_proyecto" value="<?php echo $ingreso_proyecto['id_ingreso']; ?>">
                                         </div>
 
                                         <div class="form-group">
@@ -865,7 +866,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <button type="submit" name="btn_Validar_Datos" id="btn_Validar_Datos"
-                                                    class="btn btn-primary btn-block" onclick="onSubmitFormIngresoProyecto()">Actualizar
+                                                    class="btn btn-primary btn-block" onclick="onSubmitFormIngresoProyecto()">Registrar
                                             </button>
                                         </div>
                                     </div>
@@ -927,34 +928,36 @@
                                 <span><strong><span class="glyphicon glyphicon-edit"></span> EDITAR OTROS DATOS PERSONALES: <br><?php echo $colaborador['nombre'] . " " . $colaborador['apellido_paterno'] . " " . $colaborador['apellido_materno']; ?></strong>
                             </div>
                             <div class="panel-body">
-                                <form enctype="multipart/form-data" id="form_estudios">
+                                <form enctype="multipart/form-data" id="form_otros_datos_personales">
 
                                     <div class="form-group">
-                                        <input type="hidden" class="form-control" id="id_estudios" name="id_estudios" value="<?php echo $incentivo_trimestral['id_incentivo']; ?>">
+                                        <input type="hidden" class="form-control" id="id_colaborador_datos_personales" name="id_colaborador_datos_personales" value="<?php echo $id_colaborador_ ?>">
                                     </div>
                                     <div class="form-group">
-                                        <label for="estado_civil">ESTADO CIVIL</label>
-                                        <select class="form-control" name="estado_civil" id="estado_civil" >
-                                            <option value="0">Seleccione una opción*</option>
-                                            <option value="SOLTERO">SOLTERO</option>
-                                            <option value="CASADO">CASADO</option>
-                                            <option value="UNION LIBRE">UNION LIBRE</option>
+                                        <label for="estado_civil">Estado Civil</label>
+                                        <select class="form-control" name="estado_civil" id="estado_civil">
+                                            <option value="" disabled selected> Selecciona el Estado Civil</option>
+                                            <?php echo $sEstado_Civil; ?>
+                                            <?php echo $sOtros; ?>
                                         </select>
                                         <span id="availability_estado_civil"></span>
-
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="estudios">ULTIMO GRADO DE ESTUDIOS*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
-                                        <span id="availability_estudios"></span>
+                                        <label for="ultimo_grado">Último Grado de Estudios*</label>
+                                        <select class="form-control" name="ultimo_grado" id="ultimo_grado">
+                                            <option value="" disabled selected> Selecciona el Último Grado de Estudios</option>
+                                            <?php echo $sUltimoGradoEstudios; ?>
+                                        </select>
+                                        <span id="availability_ultimo_grado"></span>
                                     </div>
+
                                 </form>
                                 <br>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <button type="submit" name="btn_Estudios" id="btn_Estudios"
-                                                class="btn btn-primary btn-block" onclick="onSubmitFormUltimoGradoEstudios()">Actualizar
+                                        <button type="submit" name="btn_Datos_Personales" id="btn_Datos_Personales"
+                                                class="btn btn-primary btn-block" onclick="onSubmitFormDatosPersonales()">Registrar
                                         </button>
                                     </div>
                                 </div>
@@ -977,57 +980,25 @@
                                 <span><strong><span class="glyphicon glyphicon-edit"></span> AGREGAR DOMICILIO PARA EL COLABORADOR <br><?php echo $colaborador['nombre'] . " " . $colaborador['apellido_paterno'] . " " . $colaborador['apellido_materno']; ?></strong>
                             </div>
                             <div class="panel-body">
-                                <form enctype="multipart/form-data" id="form_estudios">
+                                <form enctype="multipart/form-data" id="form_domicilio">
 
                                     <div class="form-group">
-                                        <input type="hidden" class="form-control" id="id_estudios" name="id_estudios" value="<?php echo $incentivo_trimestral['id_incentivo']; ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="estudios">Calle*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
-                                        <span id="availability_estudios"></span>
+                                        <input type="hidden" class="form-control" id="id_colaborador_domicilio" name="id_colaborador_domicilio" value="<?php echo $id_colaborador_ ?>">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="estudios">Número Exterior*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
-                                        <span id="availability_estudios"></span>
+                                        <label for="domicilio">Describa Detalladamente el Domicilio*</label>
+                                        <textarea class="form-control" name="domicilio" id="domicilio" style="text-transform:uppercase;" onkeyup="javascript:this.value=this.value.toUpperCase();" placeholder="Cenicienta de Figaro, 40, 874, santa Ana Poniente, 51060, TLAHUAC, CDMX"></textarea>
+
+                                        <span id="availability_domicilio"></span>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="estudios">Número Interior*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
-                                        <span id="availability_estudios"></span>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="estudios">Colonia*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
-                                        <span id="availability_estudios"></span>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="estudios">CP*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
-                                        <span id="availability_estudios"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="estudios">Municipio*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
-                                        <span id="availability_estudios"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="estudios">Estado*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
-                                        <span id="availability_estudios"></span>
-                                    </div>
                                 </form>
                                 <br>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <button type="submit" name="btn_Hijos" id="btn_Estudios"
-                                                class="btn btn-primary btn-block" onclick="onSubmitFormUltimoGradoEstudios()">Actualizar
+                                        <button type="submit" name="btn_Domicilio" id="btn_Domicilio"
+                                                class="btn btn-primary btn-block" onclick="onSubmitFormDomicilio()">Registrar
                                         </button>
                                     </div>
                                 </div>
@@ -1050,7 +1021,7 @@
                                 <span><strong><span class="glyphicon glyphicon-edit"></span> REGISTRAR HIJOS PARA EL COLABORADOR <br><?php echo $colaborador['nombre'] . " " . $colaborador['apellido_paterno'] . " " . $colaborador['apellido_materno']; ?></strong>
                             </div>
                             <div class="panel-body">
-                                <form enctype="multipart/form-data" id="form_hijos">
+                                <form enctype="multipart/form-data" id="form_hijos_registro">
 
                                     <div class="form-group">
                                         <input type="hidden" class="form-control" id="id_colaborador_hijos" name="id_colaborador_hijos" value="<?php echo $id_colaborador_ ?>">
@@ -1059,15 +1030,15 @@
                                     <div class="form-group">
                                         <label for="ocupacion">Ocupación*</label>
                                         <select class="form-control" name="ocupacion" id="ocupacion">
-                                            <option value="" disabled selected> Selecciona el Documento Obtenido</option>
+                                            <option value="" disabled selected> Selecciona la Ocupación</option>
                                             <?php echo $sOcupacion; ?>
                                         </select>
                                         <span id="availability_ocupacion"></span>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="nacimiento">Fecha de Nacimiento*</label>
-                                        <input type="date" class="form-control" id="nacimiento" name="nacimiento" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()" value="<?php echo $incentivo_trimestral['monto']; ?>">
+                                        <label for="nacimiento_fecha">Fecha de Nacimiento*</label>
+                                        <input type="date" class="form-control" id="nacimiento_fecha" name="nacimiento_fecha">
                                         <span id="availability_nacimiento"></span>
                                     </div>
 
@@ -1085,7 +1056,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <button type="submit" name="btn_Estudios" id="btn_Hijos"
-                                                class="btn btn-primary btn-block" onclick="onSubmitFormHijos()">Actualizar
+                                                class="btn btn-primary btn-block" onclick="onSubmitFormHijos()">Registrar
                                         </button>
                                     </div>
                                 </div>
@@ -1111,7 +1082,7 @@
                                 <form enctype="multipart/form-data" id="form_estudios_">
 
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="id_cola" name="id_cola" value="<?php echo $id_colaborador_ ?>">
+                                        <input type="hidden" class="form-control" id="id_cola" name="id_cola" value="<?php echo $id_colaborador_ ?>">
                                     </div>
 
                                     <div class="form-group">
@@ -1134,7 +1105,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <button type="submit" name="btn_Estudios_" id="btn_Estudios_"
-                                                class="btn btn-primary btn-block" onclick="onSubmitFormEstudios()">Actualizar
+                                                class="btn btn-primary btn-block" onclick="onSubmitFormEstudios()">Registrar
                                         </button>
                                     </div>
                                 </div>
@@ -1321,7 +1292,7 @@
             }
         }
         function onSubmitFormHijos() {
-            var frm = document.getElementById('form_hijos');
+            var frm = document.getElementById('form_hijos_registro');
             var data = new FormData(frm);
             var xhttp = new XMLHttpRequest();
 
@@ -1332,11 +1303,10 @@
             if(!document.getElementById("ocupacion").value.length)
             {
                 $('#availability_ocupacion').html('<span class="text-danger glyphicon glyphicon-remove"></span><span> Selecciona una opción</span>');
-                $('#availability_ocupacion').html('<span class="text-danger glyphicon glyphicon-remove"></span><span> Selecciona una opción</span>');
             }
             else
             {
-                if(!document.getElementById("nacimiento").value.length)
+                if(!document.getElementById("nacimiento_fecha").value.length)
                 {
                     $('#availability_nacimiento').html('<span class="text-danger glyphicon glyphicon-remove"></span><span> Selecciona una Fecha Valida</span>');
                 }
@@ -1358,7 +1328,7 @@
                                         alertify
                                             .alert("Subido con Éxito", function(){
                                             });
-                                        if($('#Modal_Documentacion').modal('hide'))
+                                        if($('#Modal_Hijos').modal('hide'))
                                         {
                                             location.reload()
                                         }
@@ -1400,9 +1370,13 @@
                         if (this.readyState == 4) {
                             var msg = xhttp.responseText;
                             if (msg == 'success') {
-                                alert(msg);
-                                $('#Modal_Incentivo_Trimestral').modal('hide')
-                                location.reload();
+                                alertify
+                                    .alert("Subido con Éxito", function(){
+                                    });
+                                if($('#Modal_Estudios').modal('hide'))
+                                {
+                                    location.reload()
+                                }
                             } else {
                                 alert(msg);
                             }
@@ -1413,6 +1387,99 @@
                     //$('#form_ingreso_proyecto').trigger('reset');
                 }
 
+            }
+        }
+        function onSubmitFormDomicilio() {
+            var frm = document.getElementById('form_domicilio');
+            var data = new FormData(frm);
+            var xhttp = new XMLHttpRequest();
+
+            $('#availability_domicilio').html('');
+
+            if(!document.getElementById("domicilio").value.length)
+            {
+                $('#availability_estudios_').html('<span class="text-danger glyphicon glyphicon-remove"></span><span> Debes llenar el campo Descripción</span>');
+            }
+            else
+            {
+                    $('#btn_Domicilio').attr("disabled", true);
+                    console.log("ya entre");
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            var msg = xhttp.responseText;
+                            if (msg == 'success') {
+                                alertify
+                                    .alert("Subido con Éxito", function(){
+                                    });
+                                if($('#Modal_Domicilios').modal('hide'))
+                                {
+                                    location.reload()
+                                }
+                            } else {
+                                alert(msg);
+                            }
+                        }
+                    };
+                    xhttp.open("POST", "/Colaboradores/DomicilioAdd", true);
+                    xhttp.send(data);
+                    //$('#form_ingreso_proyecto').trigger('reset');
+
+
+            }
+        }
+        function onSubmitFormDatosPersonales() {
+            var frm = document.getElementById('form_otros_datos_personales');
+            var data = new FormData(frm);
+            var xhttp = new XMLHttpRequest();
+
+            $('#availability_estado_civil').html('');
+            $('#availability_ultimo_grado').html('');
+
+            if(!document.getElementById("estado_civil").value.length)
+            {
+                $('#availability_estado_civil').html('<span class="text-danger glyphicon glyphicon-remove"></span><span> Selecciona una opción</span>');
+            }
+            else
+            {
+                if(!document.getElementById("ultimo_grado").value.length)
+                {
+                    $('#availability_ultimo_grado').html('<span class="text-danger glyphicon glyphicon-remove"></span><span> Selecciona una opción</span>');
+                }
+                else
+                {
+
+                    var combo = document.getElementById("estado_civil");
+                    var estado_civil_ = combo.options[combo.selectedIndex].text;
+
+                    var combo = document.getElementById("ultimo_grado");
+                    var ultimo_grado_ = combo.options[combo.selectedIndex].text;
+
+
+                        $('#btn_Datos_Personales').attr("disabled", true);
+                        console.log("ya entre");
+                        xhttp.onreadystatechange = function () {
+                            if (this.readyState == 4) {
+                                var msg = xhttp.responseText;
+                                if (msg == 'success') {
+                                    alertify
+                                        .alert("Subido con Éxito", function(){
+                                        });
+                                    if($('#Modal_Datos_Personales').modal('hide'))
+                                    {
+                                        $('#id_estado_civil').val(estado_civil_);
+                                        $('#id_ultimo_grado').val(ultimo_grado_);
+                                        $('#btn_Datos_Personales').attr("disabled", false);
+                                    }
+                                } else {
+                                    alert(msg);
+                                }
+                            }
+                        };
+                        xhttp.open("POST", "/Colaboradores/OtrosDatosPersonalesEdit", true);
+                        xhttp.send(data);
+                        //$('#form_ingreso_proyecto').trigger('reset');
+
+                }
             }
         }
         function gt_1 (a){
@@ -1451,6 +1518,64 @@
                         type: "POST",
                         async: false,
                         url: "/Colaboradores/Delete_Estudios", // script to validate in server side
+                        data: {a: a},
+                        success: function (data) {
+                            console.log("success::: " + data);
+                            result = (data == "true") ? false : true;
+
+                            if (result == true) {
+                                alert("si");
+
+                            } else {
+                                location.reload();
+                                alertify.success("Se ha eliminado correctamente");
+                            }
+                        }
+                    });
+                    // return true if username is exist in database
+                    return result;
+                }
+            });
+        }
+
+        function eliminar_hijos(a){
+
+            alertify.confirm('¿Segúro que desea eliminar lo seleccionado?', function(response) {
+                if(response) {
+                    var result = false;
+                    $.ajax({
+                        type: "POST",
+                        async: false,
+                        url: "/Colaboradores/Delete_Hijos", // script to validate in server side
+                        data: {a: a},
+                        success: function (data) {
+                            console.log("success::: " + data);
+                            result = (data == "true") ? false : true;
+
+                            if (result == true) {
+                                alert("si");
+
+                            } else {
+                                location.reload();
+                                alertify.success("Se ha eliminado correctamente");
+                            }
+                        }
+                    });
+                    // return true if username is exist in database
+                    return result;
+                }
+            });
+        }
+
+        function eliminar_domicilio(a){
+
+            alertify.confirm('¿Segúro que desea eliminar lo seleccionado?', function(response) {
+                if(response) {
+                    var result = false;
+                    $.ajax({
+                        type: "POST",
+                        async: false,
+                        url: "/Colaboradores/Delete_Domicilio", // script to validate in server side
                         data: {a: a},
                         success: function (data) {
                             console.log("success::: " + data);
