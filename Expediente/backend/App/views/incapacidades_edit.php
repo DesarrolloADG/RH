@@ -15,14 +15,14 @@
                                                 <div class="col-md-12">
                                                     <div class="panel panel-default">
                                                         <div class="panel-heading text-center">
-                                                         <span><strong><span class="glyphicon glyphicon-hdd"></span> Alta de Registro Accidente ADG</strong>
+                                                         <span><strong><span class="glyphicon glyphicon-hdd"></span> Modificar Registro Incapcidades Colaborador ADG</strong>
                                                                                     </span>
                                                         </div>
                                                         <div class="panel-body">
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
 
-                                                                    <label for="nombre_colaborador">Nombre del Colaborador Accidentado<span class="required">*</span></label>
+                                                                    <label for="nombre_colaborador">Nombre del Colaborador a Registrar Incapacidad<span class="required">*</span></label>
                                                                     <div>
                                                                         <select class="form-control" name="nombre_colaborador" id="nombre_colaborador" disabled>
                                                                             <?php echo $sColaborador; ?>

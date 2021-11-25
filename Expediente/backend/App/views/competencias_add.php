@@ -3,7 +3,7 @@
   <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
       <div class="panel panel-default">
           <div class="panel-heading text-center">
-                                                         <span><strong><span class="glyphicon glyphicon-hdd"></span> Alta de Registro Accidente ADG</strong>
+                                                         <span><strong><span class="glyphicon glyphicon-hdd"></span> Alta de Registro Competencias ADG para Vida y Carrera</strong>
                                                                                     </span>
           </div>
           <div class="panel-body">

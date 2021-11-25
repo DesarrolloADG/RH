@@ -625,6 +625,14 @@ sql;
         return $mysqli->delete($query);
     }
 
+    public static function delete_competencia($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      delete from competencias_colaborador WHERE id_competencia_colaborador = $id
+sql;
+        return $mysqli->delete($query);
+    }
+
     public static function files($id){
         $mysqli = Database::getInstance();
         $query=<<<sql
@@ -790,6 +798,20 @@ sql;
       return $mysqli->insert($query);
     }
 
+    public static function insertExtraCompetencia($competencia){
+
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      INSERT INTO competencias_colaborador
+      VALUES (null,'$competencia->_competencia', $competencia->_id_colaborador);
+sql;
+        $accion = new \stdClass();
+        $accion->_sql= $query;
+        $accion->_parametros = $parametros;
+        UtileriasLog::addAccion($accion);
+        return $mysqli->insert($query);
+    }
+
     public static function insertExtraDomicilio($estudios){
 
         $mysqli = Database::getInstance();
@@ -870,6 +892,32 @@ SELECT *
 sql;
         return $mysqli->queryAll($query);
     }
+
+    public static function getCompetencias($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT *
+  FROM catalogo_competencias 
+  WHERE catalogo_competencia_id NOT IN (SELECT catalogo_competencia_id
+                       FROM competencias_colaborador WHERE catalogo_colaboradores_id = $id)
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+
+    public static function getCompetenciasAll($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+                       
+SELECT ccc.id_competencia_colaborador, cc.nombre, ccc.catalogo_colaboradores_id
+FROM competencias_colaborador ccc
+INNER JOIN catalogo_competencias cc ON cc.catalogo_competencia_id = ccc.catalogo_competencia_id
+WHERE catalogo_colaboradores_id = $id;
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+
 
     public static function getOcupacion(){
         $mysqli = Database::getInstance();
@@ -983,7 +1031,11 @@ sql;
       public static function getCatalogoDepartamento($id){
         $mysqli = Database::getInstance();
         $query=<<<sql
-        SELECT cc.catalogo_colaboradores_id, cc.catalogo_departamento_id, cd.catalogo_departamento_id, cd.nombre FROM catalogo_colaboradores AS cc INNER JOIN catalogo_departamento AS cd WHERE cc.catalogo_colaboradores_id = $id AND cc.catalogo_departamento_id = cd.catalogo_departamento_id
+        SELECT cc.catalogo_colaboradores_id, cc.catalogo_departamento_id, 
+        cd.catalogo_departamento_id, cd.nombre FROM catalogo_colaboradores 
+        AS cc INNER JOIN catalogo_departamento AS cd 
+        WHERE cc.catalogo_colaboradores_id = $id 
+        AND cc.catalogo_departamento_id = cd.catalogo_departamento_id
 sql;
         return $mysqli->queryOne($query);
       }

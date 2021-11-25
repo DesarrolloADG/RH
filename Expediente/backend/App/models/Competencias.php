@@ -42,13 +42,12 @@ sql;
     public static function update($empresa){
       $mysqli = Database::getInstance(true);
       $query=<<<sql
-      UPDATE catalogo_competencias SET nombre = :nombre, descripcion = :descripcion, status = :status WHERE catalogo_competencia_id = :id
+      UPDATE catalogo_competencias SET nombre = :nombre, descripcion = :descripcion WHERE catalogo_competencia_id = :id
 sql;
       $parametros = array(
         ':id'=>$empresa->_catalogo_competencia_id,
         ':nombre'=>$empresa->_nombre,
-        ':descripcion'=>$empresa->_descripcion,
-        ':status'=>$empresa->_status
+        ':descripcion'=>$empresa->_descripcion
       );
       $accion = new \stdClass();
       $accion->_sql= $query;
@@ -70,8 +69,8 @@ sql;
     public static function verificarRelacion($id){
       $mysqli = Database::getInstance();
       $select = <<<sql
-      SELECT e.catalogo_competencia_id FROM catalogo_competencias e JOIN catalogo_colaboradores c
-      ON e.catalogo_competencia_id = c.catalogo_competencia_id WHERE e.catalogo_competencia_id = $id
+      SELECT e.catalogo_competencia_id FROM catalogo_competencias e 
+      WHERE e.catalogo_competencia_id = $id
 sql;
       $sqlSelect = $mysqli->queryAll($select);
       if(count($sqlSelect) >= 1)

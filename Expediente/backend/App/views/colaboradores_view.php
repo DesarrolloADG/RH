@@ -682,9 +682,15 @@
                                 <br>
                                 <div class="panel-body">
                                     <div class="col-md-6">
-                                        <div class="form-group col-md-6">
+                                        <div class="col-md-9 col-sm-9  offset-md-5">
+                                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#Modal_Datos_Personales"><i class="fa fa-edit" aria-hidden="true"></i> Editar</button>
+                                        </div>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <div class="form-group col-md-12">
                                             <label>PUESTO DE ASCENDENCIA: </label>
-                                            <input type="text" class="form-control" value="<?php echo ""; ?>" disabled>
+                                            <input type="text" class="form-control" value="<?php echo $nombrePuesto['nombre']; ?>" disabled>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>PUESTO AL QUE ESTA PROPUESTO:</label>
@@ -697,7 +703,12 @@
                                     </div>
                                     <div class="col-md-6 subir-archivos">
                                         <div class="form-group">
-                                            <label>COMPETENCIAS QUE DEBE CUMPLIR</label>
+                                            <label>COMPETENCIAS QUE DEBE CUMPLIR PARA SER ASCENDIDO</label>
+                                            <br>
+                                            <br>
+                                            <div class="col-md-9 col-sm-9  offset-md-5">
+                                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Modal_Competencias"><i class="fa fa-plus" aria-hidden="true"></i> Añadir Competencia al Colaborador</button>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="dataTable_wrapper">
@@ -707,11 +718,12 @@
                                                             <tr>
                                                                 <th><input type="checkbox" name="checkAll" id="checkAll" value=""/></th>
                                                                 <th>Competencia a cumplir</th>
-                                                                <th>Fecha de Alta</th>
+                                                                <th>Acciones</th>
                                                             </tr>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
+                                                            <?=  $tablaCompetencias; ?>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -1009,6 +1021,49 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="Modal_Competencias" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="form-group row" align="center">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading text-center">
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                </button>
+                                <span><strong><span class="glyphicon glyphicon-edit"></span> AGREGAR COMPETENCIA PARA EL COLABORADOR <br><?php echo $colaborador['nombre'] . " " . $colaborador['apellido_paterno'] . " " . $colaborador['apellido_materno']; ?></strong>
+                            </div>
+                            <div class="panel-body">
+                                <form enctype="multipart/form-data" id="form_competencias">
+
+                                    <div class="form-group">
+                                        <input type="hidden" class="form-control" id="id_colaborador_competencia" name="id_colaborador_competencia" value="<?php echo $id_colaborador_ ?>">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="competencia_c">Competencia a Asignar*</label>
+                                        <select class="form-control" name="competencia_c" id="competencia_c" required>
+                                            <option value="" disabled selected> Selecciona la Ocupación</option>
+                                            <?php echo $sCompetencia; ?>
+                                        </select>
+                                        <span id="availability_competencia"></span>
+                                    </div>
+
+                                </form>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="submit" name="btn_Competencia" id="btn_Competencia"
+                                                class="btn btn-primary btn-block" onclick="onSubmitFormCompetencia()">Registrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="Modal_Hijos" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="form-group row" align="center">
@@ -1201,6 +1256,46 @@
                         }
                     }
                 }
+            }
+        }
+        function onSubmitFormCompetencia() {
+            var frm = document.getElementById('form_competencias');
+            var data = new FormData(frm);
+            var xhttp = new XMLHttpRequest();
+
+            $('#availability_competencia').html('');
+
+            if(!document.getElementById("competencia_c").value.length)
+            {
+                $('#availability_competencia').html('<span class="text-danger glyphicon glyphicon-remove"></span><span>Selecciona Una opción</span>');
+
+            }
+            else
+            {
+                            $('#btn_Competencia').attr("disabled", true);
+                            console.log("ya entre");
+                            xhttp.onreadystatechange = function () {
+                                if (this.readyState == 4) {
+                                    var msg = xhttp.responseText;
+                                    if (msg == 'success') {
+                                        //alert(msg);
+
+                                        alertify
+                                            .alert("Subido con Éxito", function(){
+                                            });
+                                        if($('#Modal_Competencias').modal('hide'))
+                                        {
+                                            location.reload()
+                                        }
+
+                                    } else {
+                                        alert(msg);
+                                    }
+                                }
+                            };
+                            xhttp.open("POST", "/Colaboradores/CompetenciasAdd", true);
+                            xhttp.send(data);
+
             }
         }
         function onSubmitFormIngresoProyecto() {
@@ -1547,6 +1642,35 @@
                         type: "POST",
                         async: false,
                         url: "/Colaboradores/Delete_Hijos", // script to validate in server side
+                        data: {a: a},
+                        success: function (data) {
+                            console.log("success::: " + data);
+                            result = (data == "true") ? false : true;
+
+                            if (result == true) {
+                                alert("si");
+
+                            } else {
+                                location.reload();
+                                alertify.success("Se ha eliminado correctamente");
+                            }
+                        }
+                    });
+                    // return true if username is exist in database
+                    return result;
+                }
+            });
+        }
+
+        function eliminar_competencias(a){
+
+            alertify.confirm('¿Segúro que desea eliminar lo seleccionado?', function(response) {
+                if(response) {
+                    var result = false;
+                    $.ajax({
+                        type: "POST",
+                        async: false,
+                        url: "/Colaboradores/Delete_Competencia", // script to validate in server side
                         data: {a: a},
                         success: function (data) {
                             console.log("success::: " + data);

@@ -954,6 +954,14 @@ html;
 html;
         }
 
+        $sCompetencia = "";
+        foreach (ColaboradoresDao::getCompetencias($id) as $key => $value) {
+            $selected = ($value['catalogo_competencia_id']==$value['nombre'])? 'selected' : '';
+            $sCompetencia.=<<<html
+        <option {$selected} value="{$value['catalogo_competencia_id']}">{$value['nombre']}</option>
+html;
+        }
+
         $sOcupacion = "";
         foreach (ColaboradoresDao::getOcupacion() as $key => $value) {
             $selected = ($value['id_ocupacion']==$value['nombre'])? 'selected' : '';
@@ -1056,6 +1064,20 @@ html;
                     <td> {$value['fecha_accidente']} </td>            
                     <td class="center">
                         <a href="/Accidentes/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="fa fa-eye" style="color:white"></span> </a>
+                    </td>
+                </tr>
+html;
+        }
+
+        $tablaCompetencias = "";
+        foreach (ColaboradoresDao::getCompetenciasAll($id) as $key => $value) {
+            $delete_competencia = $value['id_competencia_colaborador'];
+            $tablaCompetencias.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_competencia_colaborador']}"/></td>
+                    <td> {$value['nombre']} </td>          
+                    <td class="center">
+                        <button class="btn btn-danger" type="button" id="button" onclick="eliminar_competencias($delete_competencia)"><span class="fa fa-trash" style="color:white"></button>
                     </td>
                 </tr>
 html;
@@ -1190,6 +1212,7 @@ html;
       View::set('tabla4', $tabla4);
       View::set('tabla1', $tabla1);
       View::set('tablaAccidentes', $tablaAccidentes);
+      View::set('tablaCompetencias', $tablaCompetencias);
       View::set('AntiguedadPuestoActual', $AntiguedadPuestoActual);
       View::set('TablaCapacitaciones', $TablaCapacitaciones);
       View::set('tablaSueldo', $tablaSueldo);
@@ -1201,6 +1224,7 @@ html;
       View::set('DatoUltimoCurso',$DatoUltimoCurso);
       View::set('DatoPorcentaje',$DatoPorcentaje);
       View::set('sGeneros',$sGeneros);
+      View::set('sCompetencia',$sCompetencia);
       View::set('header',$this->_contenedor->header($extraHeader));
       View::set('footer',$this->_contenedor->footer($extraFooter));
       View::render("colaboradores_view");
@@ -1278,6 +1302,22 @@ html;
 
 
         $id = ColaboradoresDao::insertExtraEstudios($estudios);
+        if($id >= 1){
+            echo 'success';
+
+        } else {
+            echo 'No se actualizo nada';
+        }
+
+    }
+
+    public function CompetenciasAdd(){
+        $competencias = new \stdClass();
+        $competencias->_id_colaborador = MasterDom::getData('id_colaborador_competencia');
+
+        $competencias->_competencia = MasterDom::getData('competencia_c');
+
+        $id = ColaboradoresDao::insertExtraCompetencia($competencias);
         if($id >= 1){
             echo 'success';
 
@@ -1984,6 +2024,19 @@ html;
 
     public function Delete_Hijos(){
         $dato = ColaboradoresDao::delete_hijos($_POST['a']);
+
+        if($dato >= 1)
+        {
+            echo "true";
+        }
+        else
+        {
+            echo "fail";
+        }
+    }
+
+    public function Delete_Competencia(){
+        $dato = ColaboradoresDao::delete_competencia($_POST['a']);
 
         if($dato >= 1)
         {

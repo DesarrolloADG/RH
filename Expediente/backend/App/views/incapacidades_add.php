@@ -22,7 +22,7 @@
                                                                     <form class="form-label-left input_mask" id="add" action="/Incapacidades/IncapacidadesAdd" method="POST">
                                                                         <div class="form-group">
 
-                                                                        <label for="nombre_colaborador">Nombre del Colaborador Accidentado<span class="required">*</span></label>
+                                                                        <label for="nombre_colaborador">Nombre del Colaborador a Registrar Incapacidad<span class="required">*</span></label>
                                                                         <div>
                                                                             <select class="form-control" name="nombre_colaborador" id="nombre_colaborador">
                                                                                 <option value="" disabled selected>Selecciona un Colaborador</option>

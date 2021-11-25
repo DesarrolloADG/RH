@@ -324,9 +324,9 @@ html;
       }
     }
 
-    public function empresaEdit(){
+    public function CompetenciasEdit(){
       $competencia = new \stdClass();
-      $competencia->_catalogo_empresa_id = MasterDom::getData('catalogo_competencia_id');
+      $competencia->_catalogo_competencia_id = MasterDom::getData('catalogo_competencia_id');
       $id = CompetenciasDao::verificarRelacion(MasterDom::getData('catalogo_competencia_id'));
       $nombre = MasterDom::getDataAll('nombre');
       $nombre = MasterDom::procesoAcentosNormal($nombre);

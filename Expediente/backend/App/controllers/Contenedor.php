@@ -228,10 +228,29 @@ if($admin['perfil_id'] == 6){
                       <ul class="nav child_menu">
                         <li><a href="/Baja/">Procesar Baja</a></li>
                       </ul>
-                   </li>
+                   </li>            
                    
                    <li><a href="/Encuestas/">Encuestas</a></li>
                    <li><a href="/RegistroCapacitaciones/">Registro Capacitaciones</a></li>
+                   
+                   <li><a>Reportes<span class="fa fa-chevron-down"></span></a> 
+                      <ul class="nav child_menu">    
+                        <li><a href="/Reportes/">Conducta, bpm's, Actas Administrativas</a></li>
+                      </ul>
+                   </li>
+
+                    <li><a>Proyectos de Mejora<span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li><a href="/Baja/">Registros Activos</a></li>
+                      </ul>
+                   </li>  
+                   <li><a>Premios e Insignias<span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li><a href="/EmpleadoADG/">Empleado ADG</a></li>
+                      </ul>
+                   </li>  
+
+
 </ul>
 html;
 

@@ -118,7 +118,8 @@ sql;
     public static function getColaboradorNombre(){
         $mysqli = Database::getInstance();
         $query=<<<sql
-SELECT c.catalogo_colaboradores_id, CONCAT(c.nombre, " ", c.apellido_paterno, " ",c.apellido_materno) AS nombre FROM catalogo_colaboradores AS c WHERE c.status = 1
+SELECT c.catalogo_colaboradores_id, CONCAT(c.nombre, " ", c.apellido_paterno, " ",c.apellido_materno) AS nombre
+FROM catalogo_colaboradores AS c WHERE c.status = 1 ORDER BY nombre ASC
 sql;
         return $mysqli->queryAll($query);
     }
