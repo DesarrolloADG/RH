@@ -76,6 +76,16 @@ class Reportes extends Controller{
         $('#id_colaborador').val(id);
 	});
 });
+     
+      $(document).ready(function(){
+	$(document).on('click', '.ver_archivo_personal', function(){
+		var id=$(this).val();
+		console.log('El código es: ' + id );
+		var url = "/reportes_personal/" + id; 
+		$('#ver_archivo_personal').modal('show');
+        $('#iframePDF').attr('src', url);
+	});   
+});     
       </script>
 html;
         $usuario = $this->__usuario;
@@ -84,7 +94,7 @@ html;
         $eliminarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 6)==1)? "" : "style=\"display:none;\"";
         $tabla= '';
         foreach ($reportes as $key => $value) {
-            $check = $value['check'];
+            $check = $value['check_l'];
             $check_tabla = "";
 
 
@@ -95,11 +105,10 @@ html;
                 <span class="bi bi-x-circle-fill fa-2x" style="color:#F73F35;"></span>
 html;
                 }
-
                 else
                 {
                     $check_tabla.=<<<html
-               <button type="button" class="btn btn-success edit" value="{$value['url']}"><span class="fa fa-eye" style="color:white"></span> Ver</button>
+               <button type="button" class="btn btn-success ver_archivo_personal" value="{$value['url']}"><span class="fa fa-eye" style="color:white"></span> Ver</button>
                <span class="bi bi-check-circle-fill fa-2x" style="color:#7DE300;"></span>
 html;
                 }
@@ -113,13 +122,10 @@ html;
                     <td>{$value['fecha_alta']}</td>
                     <td>{$value['turno']}</td>
                     <td class="center" >
-                     $check_tabla;
-                    </td>
-                    <td class="center" >
                         <a href="/Reportes/Show/{$value['id_reporte']}" type="submit" name="id_reporte" class="btn btn-success"><span class="glyphicon glyphicon-print" style="color:white"></span> </a>
                     </td>
                     <td class="center" >
-                        <a href="/Accidentes/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
+                         $check_tabla;
                     </td>
                 </tr>
 html;
@@ -533,6 +539,7 @@ html;
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("alerta");
     }
+
     public function DocumentoAdd(){
         $documento = new \stdClass();
 

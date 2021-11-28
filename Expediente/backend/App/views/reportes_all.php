@@ -47,9 +47,8 @@
                                             <th>Empleado</th>
                                             <th>Fecha de alta</th>
                                             <th>Turno</th>
-                                            <th>Cargar</th>
                                             <th>Imprimir</th>
-                                            <th>Acciones</th>
+                                            <th>Cargar</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -229,7 +228,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="ver_archivo_personal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -284,7 +283,7 @@
                         }
                     }
                 };
-                xhttp.open("POST", "/Baja/DocumentoAdd", true);
+                xhttp.open("POST", "/Reportes/DocumentoAdd", true);
                 xhttp.send(data);
                 $('#form_bajas').trigger('reset');
             }
