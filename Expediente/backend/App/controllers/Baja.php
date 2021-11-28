@@ -96,7 +96,7 @@ html;
         $tabla= '';
         $tabla_semanal= '';
         foreach ($baja as $key => $value) {
-            $check = $value['lista'];
+            $check = $value['lista{'];
             $check_tabla = "";
             $cuestionario_salida = $value['cuestionario_salida'];
             $cuestionario_tabla = "";

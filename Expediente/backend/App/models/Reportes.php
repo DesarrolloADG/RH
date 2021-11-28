@@ -15,7 +15,9 @@ class Reportes implements Crud{
   a.id_reporte,
   CONCAT(c.nombre, " ", c.apellido_paterno, " ",c.apellido_materno) AS nombre,
   a.fecha_alta,
-  a.turno
+  a.turno,
+  a.check_l,
+  a.url
   FROM reportes AS a
   INNER JOIN catalogo_colaboradores c ON a.catalogo_colaboradores_id_reportado = c.catalogo_colaboradores_id
 sql;
@@ -126,25 +128,13 @@ sql;
     {
         $mysqli = Database::getInstance();
         $query=<<<sql
-    SELECT id_accidente,
-  c.catalogo_colaboradores_id,
-  CONCAT(c.nombre, " ", c.apellido_paterno, " ",c.apellido_materno) AS nombre,
-  a.fecha_accidente,
-  a.trimestre,
-  a.id_lugar_accidente,
-  cla.detalle AS accidente,
-  a.detalle_accidente,
-  a.causa,
-  cl.id_clasificacion_accidente,
-  cl.detalle AS clasificacion_accidente, 
-  a.activo_incapacidad,
-  a.acto_inseguro,
-  a.condicion_insegura
-  FROM accidentes AS a
-  INNER JOIN catalogo_colaboradores c ON a.catalogo_colaboradores_id = c.catalogo_colaboradores_id
-  INNER JOIN catalogo_clasificacion_accidente cl ON a.id_clasificacion_accidente = cl.id_clasificacion_accidente
-  INNER JOIN catalogo_lugares_accidentes cla ON a.id_lugar_accidente = cla.id_lugar_accidente
-WHERE id_accidente = $id
+        SELECT
+        a.id_reporte,
+        CONCAT(c.nombre, " ", c.apellido_paterno, " ",c.apellido_materno) AS nombre,
+        a.fecha_alta,
+        a.turno
+        FROM reportes AS a
+        INNER JOIN catalogo_colaboradores c ON a.catalogo_colaboradores_id_reportado = c.catalogo_colaboradores_id
 sql;
         return $mysqli->queryOne($query);
     }
@@ -184,5 +174,28 @@ sql;
         else
             return array('seccion'=>1, 'id'=>$id); // Cambia el status a eliminado
 
+    }
+    public static function update_documento($documento){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+        UPDATE reportes SET
+        check_l = :lista,
+        url = :url
+      WHERE id_reporte = :id_reporte
+sql;
+        $parametros = array(
+            'lista' => 1,
+            ':url' => $documento->_url,
+            ':id_reporte' => $documento->_id_c
+        );
+        $accion = new \stdClass();
+        $accion->_sql= $query;
+        $accion->_parametros = $parametros;
+        $accion->_id = $documento->_id_reporte;
+        UtileriasLog::addAccion($accion);
+        return $mysqli->update($query, $parametros);
+
+        UtileriasLog::addAccion($accion);
+        return $id;
     }
 }

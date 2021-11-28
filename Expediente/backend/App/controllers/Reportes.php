@@ -68,6 +68,14 @@ class Reportes extends Controller{
 
        
         });
+     $(document).ready(function(){
+	$(document).on('click', '.upload', function(){
+		var id=$(this).val();
+		console.log('docuemento : ' + id );
+		$('#Modal_Documentacion').modal('show');
+        $('#id_colaborador').val(id);
+	});
+});
       </script>
 html;
         $usuario = $this->__usuario;
@@ -76,6 +84,28 @@ html;
         $eliminarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 6)==1)? "" : "style=\"display:none;\"";
         $tabla= '';
         foreach ($reportes as $key => $value) {
+            $check = $value['check'];
+            $check_tabla = "";
+
+
+                if($check == 0)
+                {
+                    $check_tabla.=<<<html
+               <button type="button" class="btn btn-primary upload" value="{$value['id_reporte']}"><i class="glyphicon glyphicon-cloud-upload" style="color:white" aria-hidden="true"></i> Subir</button>
+                <span class="bi bi-x-circle-fill fa-2x" style="color:#F73F35;"></span>
+html;
+                }
+
+                else
+                {
+                    $check_tabla.=<<<html
+               <button type="button" class="btn btn-success edit" value="{$value['url']}"><span class="fa fa-eye" style="color:white"></span> Ver</button>
+               <span class="bi bi-check-circle-fill fa-2x" style="color:#7DE300;"></span>
+html;
+                }
+
+
+
             $tabla.=<<<html
                 <tr>
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_reporte']}"/></td>
@@ -83,10 +113,10 @@ html;
                     <td>{$value['fecha_alta']}</td>
                     <td>{$value['turno']}</td>
                     <td class="center" >
-                     <a href="/Accidentes/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
+                     $check_tabla;
                     </td>
                     <td class="center" >
-                        <a href="/Accidentes/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
+                        <a href="/Reportes/Show/{$value['id_reporte']}" type="submit" name="id_reporte" class="btn btn-success"><span class="glyphicon glyphicon-print" style="color:white"></span> </a>
                     </td>
                     <td class="center" >
                         <a href="/Accidentes/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
@@ -294,13 +324,13 @@ html;
         });//fin del document.ready
       </script>
 html;
-        $accidente = AccidentesDao::getById($id);
+        $reportes = ReportesDao::getById($id);
 
         $sColaborador = "";
-        foreach (AccidentesDao::getColaboradorNombre() as $key => $value) {
-            $selected = ($accidente['catalogo_colaboradores_id']==$value['catalogo_colaboradores_id'])? 'selected' : '';
+        foreach (ReportesDao::getColaboradorNombre() as $key => $value) {
+            $selected = ($reportes['catalogo_colaboradores_id_reportado']==$value['catalogo_colaboradores_id'])? 'selected' : '';
             $sColaborador .=<<<html
-        <option {$selected} value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
+        <option {$selected} value="{$value['catalogo_colaboradores_id_reportado']}">{$value['nombre']}</option>
 html;
         }
         $sClasificacion = "";
@@ -418,31 +448,31 @@ html;
       <script>
         $(document).ready(function(){
           $("#btnCancel").click(function(){
-            window.location.href = "/Accidentes/";
+            window.location.href = "/Reportes/";
           });//fin del btnAdd
 
         });//fin del document.ready
       </script>
 html;
-        $accidente = AccidentesDao::getById($id);
+        $reportes = ReportesDao::getById($id);
 
         $sColaborador = "";
-        foreach (AccidentesDao::getColaboradorNombre() as $key => $value) {
-            $selected = ($accidente['catalogo_colaboradores_id']==$value['catalogo_colaboradores_id'])? 'selected' : '';
+        foreach (ReportesDao::getColaboradorNombre() as $key => $value) {
+            $selected = ($reportes['catalogo_colaboradores_id_reportado']==$value['catalogo_colaboradores_id_reportado'])? 'selected' : '';
             $sColaborador .=<<<html
-        <option {$selected} value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
+        <option {$selected} value="{$value['catalogo_colaboradores_id_reportado']}">{$value['nombre']}</option>
 html;
         }
         $sClasificacion = "";
-        foreach (AccidentesDao::getClasificacionrAccidente() as $key => $value) {
-            $selected = ($accidente['id_clasificacion_accidente']==$value['id_clasificacion_accidente'])? 'selected' : '';
+        foreach (ReportesDao::getClasificacionrAccidente() as $key => $value) {
+            $selected = ($reportes['id_clasificacion_accidente']==$value['id_clasificacion_accidente'])? 'selected' : '';
             $sClasificacion .=<<<html
         <option {$selected} value="{$value['id_clasificacion_accidente']}">{$value['detalle']}</option>
 html;
         }
         $sLugar = "";
-        foreach (AccidentesDao::getLugarAccidente() as $key => $value) {
-            $selected = ($accidente['id_lugar_accidente']==$value['id_lugar_accidente'])? 'selected' : '';
+        foreach (ReportesDao::getLugarAccidente() as $key => $value) {
+            $selected = ($reportes['id_lugar_accidente']==$value['id_lugar_accidente'])? 'selected' : '';
             $sLugar .=<<<html
         <option {$selected} value="{$value['id_lugar_accidente']}">{$value['detalle']}</option>
 html;
@@ -503,4 +533,31 @@ html;
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("alerta");
     }
+    public function DocumentoAdd(){
+        $documento = new \stdClass();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $documento->_id_c = $_POST['id_colaborador'];
+            $colaborador = $_POST['id_colaborador'];
+
+            $documento->_titulo = $_POST['title'];
+            $titulo = $_POST['title'];
+
+            $fichero = $_FILES["file"];
+            move_uploaded_file($fichero["tmp_name"], "reportes_personal/".$colaborador.$titulo.'.pdf');
+
+            $documento->_url = $colaborador.$titulo.'.pdf';
+            $id = ReportesDao::update_documento($documento);
+
+            if ($id) {
+                echo 'success';
+
+            } else {
+                echo 'fail';
+            }
+        } else {
+            echo 'fail REQUEST';
+        }
+    }
+
 }
