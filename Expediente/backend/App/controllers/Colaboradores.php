@@ -1363,6 +1363,25 @@ html;
 
     }
 
+    public function AscensoAdd(){
+        $ascenso = new \stdClass();
+        $ascenso->_id_colaborador = MasterDom::getData('id_colaborador_ascenso');
+
+        $ascenso->_fecha_2 = MasterDom::getData('fecha_1');
+        $ascenso->_fecha_1 = MasterDom::getData('fecha_2');
+        $ascenso->_ascenso = MasterDom::getData('ascenso');
+        $ascenso->_detalle = MasterDom::getData('detalle');
+
+        $id = ColaboradoresDao::insertAscenso($ascenso);
+        if($id >= 1){
+            echo 'success';
+
+        } else {
+            echo 'No se actualizo nada';
+        }
+
+    }
+
     public function generarPDF(){
 
       $datos = array();

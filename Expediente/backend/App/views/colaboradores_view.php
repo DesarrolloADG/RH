@@ -693,11 +693,11 @@
                                             <input type="text" class="form-control" value="<?php echo $nombrePuesto['nombre']; ?>" disabled>
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <label>PUESTO AL QUE ESTA PROPUESTO:</label>
+                                            <label>ÚLTIMO PUESTO AL QUE ESTA O ESTUVO PROPUESTO:</label>
                                             <input type="text" class="form-control" value="<?php echo ""; ?>"disabled>
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <label>TIEMPO QUE DEBE ESPERAR PARA SER ASCENDIDO: </label>
+                                            <label>TIEMPO QUE DEBE O TIENE QUE ESPERAR PARA SER ASCENDIDO: </label>
                                             <input type="text" class="form-control" value="<?php echo ""; ?>" disabled>
                                         </div>
                                     </div>
@@ -730,7 +730,40 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div>
+                                            <div class="form-group">
+                                                <label>HISTORICO DE ASCENSOS ADG</label>
+                                                <br>
+                                                <br>
+                                                <div class="col-md-9 col-sm-9  offset-md-5">
+                                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Modal_Ascenso"><i class="fa fa-plus" aria-hidden="true"></i> Nuevo</button>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="dataTable_wrapper">
+                                                            <br>
+                                                            <table class="table table-striped jambo_table bulk_action" id="muestra-cupones">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th><input type="checkbox" name="checkAll" id="checkAll" value=""/></th>
+                                                                    <th>Puesto de Ascenso</th>
+                                                                    <th>Fecha de Registro</th>
+                                                                    <th>Fecha de Termino Evaluación</th>
+                                                                    <th>Estatus</th>
+                                                                </tr>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <?=  $tablaCompetencias; ?>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
                                 <br>
                             </div>
@@ -1021,6 +1054,68 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="Modal_Ascenso" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="form-group row" align="center">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading text-center">
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                </button>
+                                <span><strong><span class="glyphicon glyphicon-edit"></span> REGISTRO DE ASCENSO PARA EL COLABORADOR <br><?php echo $colaborador['nombre'] . " " . $colaborador['apellido_paterno'] . " " . $colaborador['apellido_materno']; ?></strong>
+                            </div>
+                            <div class="panel-body">
+                                <form enctype="multipart/form-data" id="form_ascenso">
+
+                                    <div class="form-group">
+                                        <input type="hidden" class="form-control" id="id_colaborador_ascenso" name="id_colaborador_ascenso" value="<?php echo $id_colaborador_ ?>">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="ascenso">Puesto para el que esta Propuesto*</label>
+                                        <select class="form-control" name="ascenso" id="ascenso" required>
+                                            <option value="" disabled selected> Selecciona un Puesto</option>
+                                            <?php echo $sCompetencia; ?>
+                                        </select>
+                                        <span id="availability_ascenso"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="fecha_1">Fecha de Propuesta*</label>
+                                        <input type="date" class="form-control" id="fecha_1" name="fecha_1">
+                                        <span id="availability_fecha1"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for=fecha_2">Fecha de Evaluación Termino*</label>
+                                        <input type="date" class="form-control" id="fecha_2" name="fecha_2">
+                                        <span id="availability_fecha2"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="detalle">Descripción del Motivo de Ascendencia:<span class="required">*</span></label>
+                                        <textarea class="form-control" name="detalle" id="detalle" cols="40" rows="8" style="text-transform:uppercase;" onkeyup="javascript:this.value=this.value.toUpperCase();" placeholder="Describa brevemente COMO SE GENERO ESTA PROPUESTA DE ASCENSO."></textarea>
+                                        <span id="availability_detalle"></span>
+                                    </div>
+
+
+                                </form>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="submit" name="btn_Ascenso" id="btn_Ascenso"
+                                                class="btn btn-primary btn-block" onclick="onSubmitFormAscenso()">Registrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="Modal_Competencias" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="form-group row" align="center">
@@ -1295,6 +1390,63 @@
                             };
                             xhttp.open("POST", "/Colaboradores/CompetenciasAdd", true);
                             xhttp.send(data);
+
+            }
+        }
+        function onSubmitFormAscenso() {
+            var frm = document.getElementById('form_ascenso');
+            var data = new FormData(frm);
+            var xhttp = new XMLHttpRequest();
+
+            $('#availability_ascenso').html('');
+
+            if(!document.getElementById("ascenso").value.length)
+            {
+                $('#availability_ascenso').html('<span class="text-danger glyphicon glyphicon-remove"></span><span>Selecciona Una Opción</span>');
+            }
+            else
+            {
+                if(!document.getElementById("fecha_1").value.length)
+                {
+                    $('#availability_fecha1').html('<span class="text-danger glyphicon glyphicon-remove"></span><span>Selecciona Una Fecha</span>');
+                }
+                else
+                {
+                    if(!document.getElementById("fecha_2").value.length)
+                    {
+                        $('#availability_fecha2').html('<span class="text-danger glyphicon glyphicon-remove"></span><span>Selecciona Una Fecha</span>');
+                    }
+                    else {
+                        if(!document.getElementById("detalle").value.length)
+                        {
+                            $('#availability_detalle').html('<span class="text-danger glyphicon glyphicon-remove"></span><span>Escribe Brevemente una descripción del motivo de Ascendencia</span>');
+                        }
+                        else {
+                            $('#btn_Ascenso').attr("disabled", true);
+                            console.log("ya entre");
+                            xhttp.onreadystatechange = function () {
+                                if (this.readyState == 4) {
+                                    var msg = xhttp.responseText;
+                                    if (msg == 'success') {
+                                        //alert(msg);
+
+                                        alertify
+                                            .alert("Subido con Éxito", function () {
+                                            });
+                                        if ($('#Modal_Ascenso').modal('hide')) {
+                                            location.reload()
+                                        }
+
+                                    } else {
+                                        alert(msg);
+                                    }
+                                }
+                            };
+                            xhttp.open("POST", "/Colaboradores/AscensoAdd", true);
+                            xhttp.send(data);
+                        }
+                    }
+                }
 
             }
         }

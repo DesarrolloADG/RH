@@ -112,7 +112,7 @@ html;
         View::set('tabla',$tabla);
         View::set('header',$this->_contenedor->header($extraHeader));
         View::set('footer',$this->_contenedor->footer($extraFooter));
-        View::render("accidentes_all");
+        View::render("empleadoadg_all");
     }
 
     public function getColaboradorNombre(){

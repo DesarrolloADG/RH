@@ -840,6 +840,20 @@ sql;
         return $mysqli->insert($query);
     }
 
+    public static function insertAscenso($ascenso){
+
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      INSERT INTO ascenso
+      VALUES (null, $ascenso->_id_colaborador, $ascenso->_ascenso, '$ascenso->_fecha_1', '$ascenso->_fecha_2', 1,  '$ascenso->_detalle');   
+sql;
+        $accion = new \stdClass();
+        $accion->_sql= $query;
+        $accion->_parametros = $parametros;
+        UtileriasLog::addAccion($accion);
+        return $mysqli->insert($query);
+    }
+
     public static function getIdentificador(){
       $mysqli = Database::getInstance();
       $query=<<<sql
