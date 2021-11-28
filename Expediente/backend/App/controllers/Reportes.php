@@ -53,20 +53,6 @@ class Reportes extends Controller{
               }
 
             });
-
-            $("#export_pdf").click(function(){
-              $('#all').attr('action', '/Economicos/generarPDF/');
-              $('#all').attr('target', '_blank');
-              $("#all").submit();
-            });
-
-            $("#export_excel").click(function(){
-              $('#all').attr('action', '/Economicos/generarExcel/');
-              $('#all').attr('target', '_blank');
-              $("#all").submit();
-            });
-
-       
         });
      $(document).ready(function(){
 	$(document).on('click', '.upload', function(){
@@ -121,12 +107,12 @@ html;
                     <td>{$value['nombre']}</td>
                     <td>{$value['fecha_alta']}</td>
                     <td>{$value['turno']}</td>
-                    <td class="center" >
-                        <a href="/Reportes/Show/{$value['id_reporte']}" type="submit" name="id_reporte" class="btn btn-success"><span class="glyphicon glyphicon-print" style="color:white"></span> </a>
+                    <td class="center">   
+                        <a href="/Reportes/PDF/{$value['id_reporte']}" target="_blank" type="submit" name="export_pdf" class="btn btn-success"><span class="glyphicon glyphicon-print" style="color:white"></span></a>
                     </td>
                     <td class="center" >
                          $check_tabla;
-                    </td>
+                    </td>  
                 </tr>
 html;
         }
@@ -154,7 +140,84 @@ html;
         }
         return $colaborador;
     }
+    public function PDF($id){
+        $ids = $id;
+        $mpdf=new \mPDF('c');
+        $mpdf->defaultPageNumStyle = 'I';
+        $mpdf->h2toc = array('H5'=>0,'H6'=>1);
+        $style =<<<html
+      <style>
+        .imagen{
+          width:100%;
+          height: 150px;
+          background: url(/img/ag_logo.png) no-repeat center center fixed;
+          background-size: cover;
+          -moz-background-size: cover;
+          -webkit-background-size: cover
+          -o-background-size: cover;
+        }
 
+        .titulo{
+          width:100%;
+          margin-top: 30px;
+          color: #F5AA3C;
+          margin-left:auto;
+          margin-right:auto;
+        }
+      </style>
+html;
+        $tabla =<<<html
+  <img class="imagen" src="/img/ag_logo.png"/>
+  <br>
+  <div style="page-break-inside: avoid;" align='center'>
+  <H1 class="titulo">Empresas</H1>
+  <table border="0" style="width:100%;text-align: center">
+    <tr style="background-color:#B8B8B8;">
+    <th><strong>Id</strong></th>
+    <th><strong>Nombre</strong></th>
+    <th><strong>Descripción</strong></th>
+    <th><strong>Status</strong></th>
+    </tr>
+html;
+
+        if($ids!=''){
+            foreach ($ids as $key => $value) {
+                $empresa = EmpresaDao::getByIdReporte($value);
+                $tabla.=<<<html
+              <tr style="background-color:#B8B8B8;">
+              <td style="height:auto; width: 200px;background-color:#E4E4E4;">{$empresa['catalogo_empresa_id']}</td>
+              <td style="height:auto; width: 200px;background-color:#E4E4E4;">{$empresa['nombre']}</td>
+              <td style="height:auto; width: 200px;background-color:#E4E4E4;">{$empresa['descripcion']}</td>
+              <td style="height:auto; width: 200px;background-color:#E4E4E4;">{$empresa['status']}</td>
+              </tr>
+html;
+            }
+        }else{
+            foreach (ReportesDao::getAll() as $key => $empresa) {
+                $tabla.=<<<html
+            <tr style="background-color:#B8B8B8;">
+            <td style="height:auto; width: 200px;background-color:#E4E4E4;">{$empresa['catalogo_empresa_id']}</td>
+            <td style="height:auto; width: 200px;background-color:#E4E4E4;">{$empresa['nombre']}</td>
+            <td style="height:auto; width: 200px;background-color:#E4E4E4;">{$empresa['descripcion']}</td>
+            <td style="height:auto; width: 200px;background-color:#E4E4E4;">{$empresa['status']}</td>
+            </tr>
+html;
+            }
+        }
+        $tabla .=<<<html
+      </table>
+      </div>
+html;
+        $mpdf->WriteHTML($style,1);
+        $mpdf->WriteHTML($tabla,2);
+        //$nombre_archivo = "MPDF_".uniqid().".pdf";/* se genera un nombre unico para el archivo pdf*/
+        print_r($mpdf->Output());/* se genera el pdf en la ruta especificada*/
+        //echo $nombre_archivo;/* se imprime el nombre del archivo para poder retornarlo a CrmCatalogo/index */
+
+        exit;
+        //$ids = MasterDom::getDataAll('borrar');
+        //echo shell_exec('php -f /home/granja/backend/public/librerias/mpdf_apis/Api.php Competencias '.json_encode(MasterDom::getDataAll('borrar')));
+    }
 
     public function Personal(){
         $extraFooter =<<<html
