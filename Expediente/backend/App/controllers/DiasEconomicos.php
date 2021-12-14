@@ -98,8 +98,8 @@ html;
                 <tr>
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_dia_economico']}"/></td>
                     <td>{$value['nombre']}</td>
-                    <td>{$value['fecha_solicitud']}</td>
-                    <td>{$value['fecha_dia_economico']}</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha_solicitud']}</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha_dia_economico']}</td>
                     <td>{$value['estatus']}</td>
                     <td>-</td>
                     <td class="center" >

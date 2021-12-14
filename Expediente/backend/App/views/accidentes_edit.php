@@ -104,9 +104,8 @@
                                                             <input type="hidden" name="id_accidente" id="id_accidente" value="<?php echo $accidente['id_accidente']; ?>"/>
 
                                                             <div class="form-group ">
-                                                                <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-2 col-xs-offset-3">
+                                                                <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-4 col-xs-offset-3">
                                                                     <button class="btn btn-danger col-md-3 col-sm-3 col-xs-5" type="button" id="btnCancel">Cancelar</button>
-                                                                    <button class="btn btn-primary col-md-3 col-sm-3 col-xs-5" type="reset" >Resetear</button>
                                                                     <button class="btn btn-success col-md-3 col-sm-3 col-xs-5" id="btnAdd" type="submit">Actualizar</button>
                                                                 </div>
                                                             </div>

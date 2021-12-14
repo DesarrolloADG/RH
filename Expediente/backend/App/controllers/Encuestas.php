@@ -17,7 +17,7 @@ class Encuestas extends Controller{
     $this->_contenedor = new Contenedor;
     View::set('header',$this->_contenedor->header());
     View::set('footer',$this->_contenedor->footer());
-  }
+}
 
     public function index() {
         $extraFooter =<<<html
@@ -43,6 +43,35 @@ class Encuestas extends Controller{
 
             var checkAll = 0;
             $("#checkAll").click(function () {
+              if(checkAll==0){
+                $("input:checkbox").prop('checked', true);
+                checkAll = 1;
+              }else{
+                $("input:checkbox").prop('checked', false);
+                checkAll = 0;
+              }
+
+            });
+            
+            $("#muestra-cupones-ingreso").tablesorter();
+          var oTable = $('#muestra-cupones-ingreso').DataTable({
+                "columnDefs": [{
+                    "orderable": false,
+                    "targets": 0
+                }],
+                 "order": false
+            });
+
+            // Remove accented character from search input as well
+            $('#muestra-cupones-ingreso input[type=search]').keyup( function () {
+                var table = $('#example').DataTable();
+                table.search(
+                    jQuery.fn.DataTable.ext.type.search.html(this.value)
+                ).draw();
+            });
+
+            var checkAll = 0;
+            $("#checkAllIngreso").click(function () {
               if(checkAll==0){
                 $("input:checkbox").prop('checked', true);
                 checkAll = 1;
@@ -93,7 +122,219 @@ html;
                     <td>{$value['estatus']}</td>
                     <td class="center" >
                         <a href="/Encuestas/Edit/{$value['id_cuestionario_activo']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
-                        <a href="/Encuestas/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
+                        <a href="/Encuestas/EvaluadosComunicacionOrganizacional/{$value['id_cuestionario_activo']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-user" style="color:white"></span> </a>
+                    </td>
+                </tr>
+html;
+        }
+
+        $encuestas_comunicacion_organizacional = EncuestasDao::getAllComunicacionOrganizacional();
+        $tabla_comunicacion_organizacional= '';
+        foreach ($encuestas_comunicacion_organizacional as $key => $value) {
+            $estatus = $value['activo_incapacidad'];
+            if($estatus == 0)
+            {
+                $estatus = "SIN INCAPACIDAD";
+            }
+            if($estatus == 1)
+            {
+                $estatus = "INCAPACIDAD ACTIVA";
+            }
+            $tabla_comunicacion_organizacional.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_cuestionario_activo']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_inicio']}</td>
+                    <td>{$value['fecha_fin']}</td>
+                    <td>{$value['fecha_activacion']}</td>
+                    <td>{$value['trimestre']}</td>
+                    <td>{$value['estatus']}</td>
+                    <td class="center" >
+                        <a href="/Encuestas/Edit/{$value['id_cuestionario_activo']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
+                        <a href="/Encuestas/EvaluadosComunicacionOrganizacional/{$value['id_cuestionario_activo']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-user" style="color:white"></span> </a>
+                    </td>
+                </tr>
+html;
+        }
+
+        $encuestas_comunicacion = EncuestasDao::getAllComunicacion();
+        $tabla_comunicacion= '';
+        foreach ($encuestas_comunicacion as $key => $value) {
+            $estatus = $value['activo_incapacidad'];
+            if($estatus == 0)
+            {
+                $estatus = "SIN INCAPACIDAD";
+            }
+            if($estatus == 1)
+            {
+                $estatus = "INCAPACIDAD ACTIVA";
+            }
+            $tabla_comunicacion.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_cuestionario_activo']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_inicio']}</td>
+                    <td>{$value['fecha_fin']}</td>
+                    <td>{$value['fecha_activacion']}</td>
+                    <td>{$value['trimestre']}</td>
+                    <td>{$value['estatus']}</td>
+                    <td class="center" >
+                        <a href="/Encuestas/Edit/{$value['id_cuestionario_activo']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
+                        <a href="/Encuestas/EvaluadosComunicacionOrganizacional/{$value['id_cuestionario_activo']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-user" style="color:white"></span> </a>
+                    </td>
+                </tr>
+html;
+        }
+
+        $encuestas_clima_laboral = EncuestasDao::getAllClimaLaboral();
+        $tabla_clima_laboral= '';
+        foreach ($encuestas_clima_laboral as $key => $value) {
+            $estatus = $value['activo_incapacidad'];
+            if($estatus == 0)
+            {
+                $estatus = "SIN INCAPACIDAD";
+            }
+            if($estatus == 1)
+            {
+                $estatus = "INCAPACIDAD ACTIVA";
+            }
+            $tabla_clima_laboral.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_cuestionario_activo']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_inicio']}</td>
+                    <td>{$value['fecha_fin']}</td>
+                    <td>{$value['fecha_activacion']}</td>
+                    <td>{$value['trimestre']}</td>
+                    <td>{$value['estatus']}</td>
+                    <td class="center" >
+                        <a href="/Encuestas/Edit/{$value['id_cuestionario_activo']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
+                        <a href="/Encuestas/Evaluados/{$value['id_cuestionario_activo']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-user" style="color:white"></span> </a>
+                    </td>
+                </tr>
+html;
+        }
+
+        $encuestas_comunicacion_organizacional = EncuestasDao::getAllComunicacionOrganizacional();
+        $tabla_comunicacion_organizacional= '';
+        foreach ($encuestas_comunicacion_organizacional as $key => $value) {
+            $estatus = $value['activo_incapacidad'];
+            if($estatus == 0)
+            {
+                $estatus = "SIN INCAPACIDAD";
+            }
+            if($estatus == 1)
+            {
+                $estatus = "INCAPACIDAD ACTIVA";
+            }
+            $tabla_comunicacion_organizacional.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_cuestionario_activo']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_inicio']}</td>
+                    <td>{$value['fecha_fin']}</td>
+                    <td>{$value['fecha_activacion']}</td>
+                    <td>{$value['trimestre']}</td>
+                    <td>{$value['estatus']}</td>
+                    <td class="center" >
+                        <a href="/Encuestas/Edit/{$value['id_cuestionario_activo']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
+                        <a href="/Encuestas/Evaluados/{$value['id_cuestionario_activo']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-user" style="color:white"></span> </a>
+                    </td>
+                </tr>
+html;
+        }
+
+        $encuestas_ingreso = EncuestasDao::getAllIngreso();
+        $tablaIngreso= '';
+        foreach ($encuestas_ingreso as $key => $value) {
+            $estatus = $value['resuelto'];
+            $acc = "";
+            if($estatus == 0)
+            {
+                $estatus = "SIN RESPONDER";
+                $acc = <<<html
+                        <a href="/Encuestas/Ingreso/{$value['id_cuestionario_activo']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> *RH </a>
+html;
+            }
+            if($estatus == 1)
+            {
+                $estatus = "REGISTRO EXITOSO";
+                $acc = <<<html
+                        <a href="/Encuestas/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> VER </a>
+html;
+            }
+            $tablaIngreso.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_cuestionario_colaborador']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_alta']}</td>
+                    <td>$estatus</td>
+                    <td class="center" >
+                    $acc
+                    </td>
+                </tr>
+html;
+        }
+
+        $encuestas_salida = EncuestasDao::getAllSalida();
+        $tablaSalida= '';
+        foreach ($encuestas_salida as $key => $value) {
+            $estatus = $value['resuelto'];
+            $acc = "";
+            if($estatus == 0)
+            {
+                $estatus = "SIN RESPONDER";
+                $acc = <<<html
+                        <a href="/Encuestas/Salida/{$value['id_cuestionario_activo']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> *RH </a>
+html;
+            }
+            if($estatus == 1)
+            {
+                $estatus = "REGISTRO EXITOSO";
+                $acc = <<<html
+                        <a href="/Encuestas/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> VER </a>
+html;
+            }
+            $tablaSalida.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_cuestionario_colaborador']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_baja']}</td>
+                    <td>$estatus</td>
+                    <td class="center" >
+                    $acc
+                    </td>
+                </tr>
+html;
+        }
+
+        $encuestas_induccion = EncuestasDao::getAllInduccion();
+        $tablaInduccion= '';
+        foreach ($encuestas_induccion as $key => $value) {
+            $estatus = $value['resuelto'];
+            $acc = "";
+            if($estatus == 0)
+            {
+                $estatus = "SIN RESPONDER";
+                $acc = <<<html
+                        <a href="/Encuestas/Induccion/{$value['id_cuestionario_activo']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> *RH </a>
+html;
+            }
+            if($estatus == 1)
+            {
+                $estatus = "REGISTRO EXITOSO";
+                $acc = <<<html
+                        <a href="/Encuestas/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> VER </a>
+html;
+            }
+            $tablaInduccion.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_cuestionario_colaborador']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_baja']}</td>
+                    <td>$estatus</td>
+                    <td class="center" >
+                    $acc
                     </td>
                 </tr>
 html;
@@ -108,6 +349,12 @@ html;
         View::set('editarHidden',$editarHidden);
         View::set('eliminarHidden',$eliminarHidden);
         View::set('tabla',$tabla);
+        View::set('tabla_comunicacion_organizacional',$tabla_comunicacion_organizacional);
+        View::set('tablaIngreso',$tablaIngreso);
+        View::set('tabla_comunicacion',$tabla_comunicacion);
+        View::set('tabla_clima_laboral',$tabla_clima_laboral);
+        View::set('tablaSalida',$tablaSalida);
+        View::set('tablaInduccion',$tablaInduccion);
         View::set('header',$this->_contenedor->header($extraHeader));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("encuestas_all");
@@ -122,6 +369,7 @@ html;
         }
         return $tipo_encuesta;
     }
+
     public function add(){
         $extraFooter =<<<html
       <script>
@@ -275,6 +523,21 @@ html;
 
     }
 
+    public function EncuestasComunicacionOrganizacionalAdd(){
+        $encuestas = new \stdClass();
+
+        $encuestas->_nombre_colaborador = MasterDom::getData('nombre_colaborador');
+        $encuestas->_id_encuesta = MasterDom::getData('id_encuesta');
+
+        $id = EncuestasDao::insertEncuestasComunicacionOrganizacional($encuestas);
+        if ($id) {
+            echo 'fail';
+
+        } else {
+            echo 'success';
+        }
+    }
+
     public function edit($id){
         $extraFooter =<<<html
       <script>
@@ -363,6 +626,90 @@ html;
         View::set('header',$this->_contenedor->header(''));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("encuestas_edit");
+    }
+
+    public function Ingreso($id){
+        $extraFooter =<<<html
+
+html;
+        $encuesta = $id;
+        View::set('header',$this->_contenedor->header(''));
+        View::set('footer',$this->_contenedor->footer($extraFooter));
+        View::set('encuesta', $encuesta);
+        View::render("ingreso_add");
+    }
+
+    public function EvaluadosComunicacionOrganizacional($id){
+        $extraFooter =<<<html
+
+html;
+        $id_encuesta = $id;
+        $colaborador_ = '';
+        foreach (EncuestasDao::getColaboradorNombre($id) as $key => $value) {
+            $colaborador_ .=<<<html
+                <option value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
+html;
+        }
+
+        $encuesta = $id;
+        View::set('header',$this->_contenedor->header(''));
+        View::set('footer',$this->_contenedor->footer($extraFooter));
+        View::set('encuesta', $encuesta);
+        View::set('id_encuesta', $id_encuesta);
+        View::set('idColaborador',$colaborador_);
+        View::render("registro_evaluados_comunicacion_organizacional");
+    }
+
+    public function Induccion($id){
+        $extraFooter =<<<html
+
+html;
+        $encuesta = $id;
+        View::set('header',$this->_contenedor->header(''));
+        View::set('footer',$this->_contenedor->footer($extraFooter));
+        View::set('encuesta', $encuesta);
+        View::render("induccion_add");
+    }
+
+    public function IngresoAdd(){
+        $ingreso = new \stdClass();
+        $ingreso->_id = MasterDom::getData('id');
+        $ingreso->_uno = MasterDom::getData('uno');
+        $ingreso->_dos = MasterDom::getData('dos');
+        $ingreso->_tres = MasterDom::getData('tres');
+        $ingreso->_cuatro = MasterDom::getData('cuatro');
+        $ingreso->_cinco = MasterDom::getData('cinco');
+        $ingreso->_seis = MasterDom::getData('seis');
+        $ingreso->_siete = MasterDom::getData('siete');
+        $ingreso->_ocho = MasterDom::getData('ocho');
+        $ingreso->_nueve = MasterDom::getData('nueve');
+        $ingreso->_diez = MasterDom::getData('diez');
+        $ingreso->_once = MasterDom::getData('once');
+        $ingreso->_nombre = MasterDom::getData('nombre');
+        $ingreso->_numero = MasterDom::getData('numero');
+
+        $id = EncuestasDao::insertIngreso($ingreso);
+        EncuestasDao::update($ingreso);
+        if($id >= 1 )
+        {
+            $this->alerta($id,'add');
+        }
+        else
+        {
+            $this->alerta($id,'error');
+        }
+
+    }
+
+    public function Salida($id){
+        $extraFooter =<<<html
+
+html;
+        $encuesta = $id;
+        View::set('header',$this->_contenedor->header(''));
+        View::set('footer',$this->_contenedor->footer($extraFooter));
+        View::set('encuesta', $encuesta);
+        View::render("salida_add");
     }
 
     public function AccidentesEdit(){

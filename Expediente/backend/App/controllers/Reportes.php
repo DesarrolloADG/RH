@@ -75,7 +75,13 @@ class Reportes extends Controller{
       </script>
 html;
         $usuario = $this->__usuario;
+        View::set('idColaborador',$this->getColaboradorNombre());
+        View::set('idMotivo',$this->getMotivo());
+        View::set('idMotivoActa',$this->getMotivoActa());
+
         $reportes = ReportesDao::getAll();
+        $reportesbpm = ReportesDao::getAllBPM();
+        $reportesacta = ReportesDao::getAllActa();
         $editarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 5)==1)?  "" : "style=\"display:none;\"";
         $eliminarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 6)==1)? "" : "style=\"display:none;\"";
         $tabla= '';
@@ -99,8 +105,6 @@ html;
 html;
                 }
 
-
-
             $tabla.=<<<html
                 <tr>
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_reporte']}"/></td>
@@ -117,15 +121,50 @@ html;
 html;
         }
 
-        $pdfHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 2)==1)?  "" : "style=\"display:none;\"";
-        $excelHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 3)==1)? "" : "style=\"display:none;\"";
+        $tablabpm= '';
+        foreach ($reportesbpm as $key => $value) {
+
+            $tablabpm.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_reporte']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_alta']}</td>
+                    <td>{$value['hora']}</td>
+                     <td>{$value['detalle']}</td>
+                     <td>{$value['descripcion']}</td>
+                     <td>{$value['comentario_empleado']}</td>
+                     <td class="center" >
+                         <button type="button" class="btn btn-success ver_archivo_personal" value="{$value['url']}"><span class="fa fa-eye" style="color:white"></span> Ver</button>
+                     </td>
+                </tr>
+html;
+        }
+
+
+        $tablaacta= '';
+        foreach ($reportesacta as $key => $value) {
+
+            $tablaacta.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_reporte']}"/></td>
+                    <td>{$value['nombre']}</td>
+                    <td>{$value['fecha_alta']}</td>
+                     <td>{$value['descripcion']}</td>
+                     <td>{$value['descc']}</td>
+                     <td class="center" >
+                         <button type="button" class="btn btn-success ver_archivo_personal" value="{$value['url']}"><span class="fa fa-eye" style="color:white"></span> Ver</button>
+                    </td>
+                </tr>
+html;
+        }
+
         $agregarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 4)==1)? "" : "style=\"display:none;\"";
-        View::set('pdfHidden',$pdfHidden);
-        View::set('excelHidden',$excelHidden);
         View::set('agregarHidden',$agregarHidden);
         View::set('editarHidden',$editarHidden);
         View::set('eliminarHidden',$eliminarHidden);
         View::set('tabla',$tabla);
+        View::set('tablabpm',$tablabpm);
+        View::set('tablaacta',$tablaacta);
         View::set('header',$this->_contenedor->header($extraHeader));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("reportes_all");
@@ -140,17 +179,56 @@ html;
         }
         return $colaborador;
     }
+
+    public function getColaboradorNombreJefes(){
+        $colaborador = '';
+        foreach (ReportesDao::getColaboradorNombreJefes() as $key => $value) {
+            $colaborador .=<<<html
+        <option value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
+html;
+        }
+        return $colaborador;
+    }
+
+    public function getMotivo(){
+        $motivo = '';
+        foreach (ReportesDao::getMotivo() as $key => $value) {
+            $motivo .=<<<html
+        <option value="{$value['id_catalogo_incumplimiento']}">{$value['detalle']}</option>
+html;
+        }
+        return $motivo;
+    }
+
+    public function getMotivoActa(){
+        $motivo_acta = '';
+        foreach (ReportesDao::getMotivoActa() as $key => $value) {
+            $motivo_acta .=<<<html
+        <option value="{$value['id_catatalogo_motivo']}">{$value['descripcion']}</option>
+html;
+        }
+        return $motivo_acta;
+    }
+
     public function PDF($id){
         $ids = $id;
-        $mpdf=new \mPDF('c');
-        $mpdf->defaultPageNumStyle = 'I';
-        $mpdf->h2toc = array('H5'=>0,'H6'=>1);
+        $mpdf=new \mPDF('R','A4', 11,'Arial');
+        $mpdf -> SetTitle('Reporte al Personal');
+        $mpdf->SetHTMLHeader('<img src="/img/cabecera.png"/>');
+        $mpdf -> WriteHTML('<br>');
+        $mpdf -> WriteHTML('<br>');
+
+        $mpdf -> WriteHTML('<body>');
+
+        $mpdf -> WriteHTML('wdwdwd');
+        $mpdf -> WriteHTML('</body>');
+        $mpdf -> Output('NombreDeTuArchivo.pdf', 'I');
         $style =<<<html
       <style>
         .imagen{
           width:100%;
           height: 150px;
-          background: url(/img/ag_logo.png) no-repeat center center fixed;
+          background: url(/img/cabecera.png) no-repeat center center fixed;
           background-size: cover;
           -moz-background-size: cover;
           -webkit-background-size: cover
@@ -167,10 +245,15 @@ html;
       </style>
 html;
         $tabla =<<<html
-  <img class="imagen" src="/img/ag_logo.png"/>
+  <img class="imagen" src="/img/cabecera.png"/>
   <br>
   <div style="page-break-inside: avoid;" align='center'>
-  <H1 class="titulo">Empresas</H1>
+  <div>
+  
+  </div>
+  <H3 class="titulo">Empresas</H3>
+  <H3 class="titulo">Empresas</H3>
+  <H3 class="titulo">Empresas</H3>
   <table border="0" style="width:100%;text-align: center">
     <tr style="background-color:#B8B8B8;">
     <th><strong>Id</strong></th>
@@ -210,14 +293,9 @@ html;
 html;
         $mpdf->WriteHTML($style,1);
         $mpdf->WriteHTML($tabla,2);
-        //$nombre_archivo = "MPDF_".uniqid().".pdf";/* se genera un nombre unico para el archivo pdf*/
         print_r($mpdf->Output());/* se genera el pdf en la ruta especificada*/
-        //echo $nombre_archivo;/* se imprime el nombre del archivo para poder retornarlo a CrmCatalogo/index */
-
         exit;
-        //$ids = MasterDom::getDataAll('borrar');
-        //echo shell_exec('php -f /home/granja/backend/public/librerias/mpdf_apis/Api.php Competencias '.json_encode(MasterDom::getDataAll('borrar')));
-    }
+       }
 
     public function Personal(){
         $extraFooter =<<<html
@@ -245,6 +323,9 @@ html;
               },
               check:{
                 required: true
+              },
+              reporta:{
+                required: true
               }
             },
             messages:{
@@ -268,6 +349,9 @@ html;
               },
                check:{
                 required: "Este campo es requerido"
+              },
+              reporta:{
+                required: "Este campo es requerido"
               }
             }
           });//fin del jquery validate
@@ -284,6 +368,7 @@ html;
         View::set('header',$this->_contenedor->header(''));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::set('idColaborador',$this->getColaboradorNombre());
+        View::set('idColaboradorJefes',$this->getColaboradorNombreJefes());
         View::render("reporte_personal_add");
     }
 
@@ -297,6 +382,7 @@ html;
         $reporte_personal->_supervisor = MasterDom::getData('supervisor');
         $reporte_personal->_detalle = MasterDom::getData('detalle');
         $check = MasterDom::getData('check');
+        $check_grave = MasterDom::getData('check-grave');
 
         if($check == 'on')
         {
@@ -304,6 +390,14 @@ html;
         }
         else{
             $reporte_personal->_check = 0;
+        }
+
+        if($check_grave == 'on')
+        {
+            $reporte_personal->_check_grave = 1;
+        }
+        else{
+            $reporte_personal->_check_grave = 0;
         }
 
             $id = ReportesDao::insert($reporte_personal);
@@ -402,25 +496,8 @@ html;
         <option {$selected} value="{$value['catalogo_colaboradores_id_reportado']}">{$value['nombre']}</option>
 html;
         }
-        $sClasificacion = "";
-        foreach (AccidentesDao::getClasificacionrAccidente() as $key => $value) {
-            $selected = ($accidente['id_clasificacion_accidente']==$value['id_clasificacion_accidente'])? 'selected' : '';
-            $sClasificacion .=<<<html
-        <option {$selected} value="{$value['id_clasificacion_accidente']}">{$value['detalle']}</option>
-html;
-        }
-        $sLugar = "";
-        foreach (AccidentesDao::getLugarAccidente() as $key => $value) {
-            $selected = ($accidente['id_lugar_accidente']==$value['id_lugar_accidente'])? 'selected' : '';
-            $sLugar .=<<<html
-        <option {$selected} value="{$value['id_lugar_accidente']}">{$value['detalle']}</option>
-html;
-        }
 
         View::set('sColaborador',$sColaborador);
-        View::set('sClasificacion',$sClasificacion);
-        View::set('sLugar',$sLugar);
-        View::set('accidente',$accidente);
         View::set('header',$this->_contenedor->header(''));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("accidentes_edit");
@@ -532,25 +609,8 @@ html;
         <option {$selected} value="{$value['catalogo_colaboradores_id_reportado']}">{$value['nombre']}</option>
 html;
         }
-        $sClasificacion = "";
-        foreach (ReportesDao::getClasificacionrAccidente() as $key => $value) {
-            $selected = ($reportes['id_clasificacion_accidente']==$value['id_clasificacion_accidente'])? 'selected' : '';
-            $sClasificacion .=<<<html
-        <option {$selected} value="{$value['id_clasificacion_accidente']}">{$value['detalle']}</option>
-html;
-        }
-        $sLugar = "";
-        foreach (ReportesDao::getLugarAccidente() as $key => $value) {
-            $selected = ($reportes['id_lugar_accidente']==$value['id_lugar_accidente'])? 'selected' : '';
-            $sLugar .=<<<html
-        <option {$selected} value="{$value['id_lugar_accidente']}">{$value['detalle']}</option>
-html;
-        }
 
         View::set('sColaborador',$sColaborador);
-        View::set('sClasificacion',$sClasificacion);
-        View::set('sLugar',$sLugar);
-        View::set('accidente',$accidente);
         View::set('header',$this->_contenedor->header(''));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("accidentes_view");
@@ -607,6 +667,7 @@ html;
         $documento = new \stdClass();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $fechamovimiento =  date('Y-m-d');
             $documento->_id_c = $_POST['id_colaborador'];
             $colaborador = $_POST['id_colaborador'];
 
@@ -614,10 +675,77 @@ html;
             $titulo = $_POST['title'];
 
             $fichero = $_FILES["file"];
-            move_uploaded_file($fichero["tmp_name"], "reportes_personal/".$colaborador.$titulo.'.pdf');
+            move_uploaded_file($fichero["tmp_name"], "reportes_personal/".$colaborador.$titulo.$fechamovimiento.'.pdf');
 
-            $documento->_url = $colaborador.$titulo.'.pdf';
+            $documento->_url = $colaborador.$titulo.$fechamovimiento.'.pdf';
             $id = ReportesDao::update_documento($documento);
+
+            if ($id) {
+                echo 'success';
+
+            } else {
+                echo 'fail';
+            }
+        } else {
+            echo 'fail REQUEST';
+        }
+    }
+
+    public function DocumentoBPM(){
+        $documento = new \stdClass();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            $documento->_fecha = $_POST['fecha'];
+            $documento->_hora = $_POST['hora'];
+            $documento->_nombre_colaborador_reporte = $_POST['nombre_colaborador_reporte'];
+            $documento->_nombre_colaborador_reportado = $_POST['nombre_colaborador_reportado'];
+            $documento->_motivo = $_POST['motivo'];
+            $documento->_otro = $_POST['otro'];
+            $documento->_observaciones = $_POST['observaciones'];
+
+            $titulo = 'ReporteBPM';
+            $colaborador  = $_POST['nombre_colaborador_reporte'];
+            $fichero = $_FILES["file"];
+            $fecha = $_POST['fecha'];
+            move_uploaded_file($fichero["tmp_name"], "reportes_personal/".$colaborador.$titulo.$fecha.'.pdf');
+
+            $documento->_url = $colaborador.$titulo.$fecha.'.pdf';
+
+
+            $id = ReportesDao::insertReporteBPM($documento);
+
+            if ($id) {
+                echo 'success';
+
+            } else {
+                echo 'fail';
+            }
+        } else {
+            echo 'fail REQUEST';
+        }
+    }
+
+    public function DocumentoActa(){
+        $documento = new \stdClass();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            $documento->_fecha = $_POST['fecha_'];
+            $documento->_nombre_colaborador_reportado = $_POST['nombre_colaborador_reportado_'];
+            $documento->_motivo = $_POST['motivo_'];
+            $documento->_observaciones = $_POST['otro_'];
+
+            $titulo = 'ReporteActaAdministrativa';
+            $colaborador  = $_POST['nombre_colaborador_reportado_'];
+            $fecha = $_POST['fecha_'];
+            $fichero = $_FILES["file_"];
+            move_uploaded_file($fichero["tmp_name"], "reportes_personal/".$colaborador.$titulo.$fecha.'.pdf');
+
+            $documento->_url = $colaborador.$titulo.$fecha.'.pdf';
+
+
+            $id = ReportesDao::insertReporteActa($documento);
 
             if ($id) {
                 echo 'success';

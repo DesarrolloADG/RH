@@ -6,8 +6,7 @@ use \Core\View;
 use \Core\MasterDom;
 use \App\controllers\Contenedor;
 use \Core\Controller;
-use \App\models\Accidentes AS AccidentesDao;
-use \App\models\General AS GeneralDao;
+use \App\models\EmpleadoADG AS EmpleadoADGDao;
 
 class EmpleadoADG extends Controller{
 
@@ -71,78 +70,44 @@ class EmpleadoADG extends Controller{
       </script>
 html;
         $usuario = $this->__usuario;
-        $accidentes = AccidentesDao::getAll();
+        $empleado = EmpleadoADGDao::getAll();
         $editarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 5)==1)?  "" : "style=\"display:none;\"";
         $eliminarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 6)==1)? "" : "style=\"display:none;\"";
         $tabla= '';
-        foreach ($accidentes as $key => $value) {
+        foreach ($empleado as $key => $value) {
             $estatus = $value['activo_incapacidad'];
             if($estatus == 0)
             {
-                $estatus = "SIN INCAPACIDAD";
+                $estatus = "PENDIENTE";
             }
             if($estatus == 1)
             {
-                $estatus = "INCAPACIDAD ACTIVA";
+                $estatus = "ENTREGADO";
             }
             $tabla.=<<<html
                 <tr>
-                    <td><input type="checkbox" name="borrar[]" value="{$value['id_accidente']}"/></td>
-                    <td>{$value['nombre']}</td>
-                    <td>{$value['fecha_accidente']}</td>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_empleado_adg']}"/></td>
+                    <td>{$value['ano_registro']}</td>
+                    <td>{$value['descripcion_premio']}</td>
                     <td>{$value['trimestre']}</td>
+                    <td>{$value['fecha_registro']}</td>
+                    <td>$ {$value['cantidad_premio']}</td>
                     <td>$estatus</td>
-                    <td>{$value['clasificacion_accidente']}</td>
                     <td class="center" >
-                        <a href="/Accidentes/Edit/{$value['id_accidente']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
-                        <a href="/Accidentes/Show/{$value['id_accidente']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
+                        <a href="/EmpleadoADG/Produccion/{$value['id_empleado_adg']}" type="submit" name="id_accidente" class="btn btn-success"><span class="glyphicon glyphicon-user" style="color:white"></span> Candidatos</a>
+                        <a href="/EmpleadoADG/Edit/{$value['id_empleado_adg']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
+                    </td>
+                    <td class="center" >
+                        <a href="/EmpleadoADG/Produccion/{$value['id_empleado_adg']}" type="submit" name="id_accidente" class="btn btn-success"><span class="fa fa-yelp" style="color:white"></span> Premiados</a>
                     </td>
                 </tr>
 html;
         }
 
-        $pdfHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 2)==1)?  "" : "style=\"display:none;\"";
-        $excelHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 3)==1)? "" : "style=\"display:none;\"";
-        $agregarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 4)==1)? "" : "style=\"display:none;\"";
-        View::set('pdfHidden',$pdfHidden);
-        View::set('excelHidden',$excelHidden);
-        View::set('agregarHidden',$agregarHidden);
         View::set('editarHidden',$editarHidden);
-        View::set('eliminarHidden',$eliminarHidden);
         View::set('tabla',$tabla);
-        View::set('header',$this->_contenedor->header($extraHeader));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("empleadoadg_all");
-    }
-
-    public function getColaboradorNombre(){
-        $colaborador = '';
-        foreach (AccidentesDao::getColaboradorNombre() as $key => $value) {
-            $colaborador .=<<<html
-        <option value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
-html;
-        }
-        return $colaborador;
-    }
-
-    public function getLugarAccidente(){
-        $lugar = '';
-        foreach (AccidentesDao::getLugarAccidente() as $key => $value) {
-            $lugar .=<<<html
-        <option value="{$value['id_lugar_accidente']}">{$value['detalle']}</option>
-html;
-        }
-        return $lugar;
-    }
-
-    public function getCalsificacionAccidente(){
-        $clasificacion = '';
-        foreach (AccidentesDao::getClasificacionrAccidente() as $key => $value) {
-            $clasificacion .=<<<html
-        <option value="{$value['id_clasificacion_accidente']}">{$value['detalle']}</option>
-html;
-        }
-        return $clasificacion;
     }
 
     public function add(){
@@ -151,60 +116,30 @@ html;
         $(document).ready(function(){
           $("#add").validate({
             rules:{
-              nombre_colaborador:{
+              ano:{
                 required: true
               },
               fecha:{
                 required: true
               },
-              trimestre:{
-                required: true
-              },
-              lugar:{
-                required: true
-              },
-	           clasificacion:{
-                required: true
-              },
               detalle:{
                 required: true
               },
-              causa:{
-                required: true
-              },
-              acto:{
-                required: true
-              },
-              condicion:{
+              cantidad:{
                 required: true
               }
             },
             messages:{
-              nombre_colaborador:{
+              ano:{
                 required: "Este campo es requerido"
               },
              fecha:{
                 required: "Este campo es requerido"
               },
-              trimestre:{
-                required: "Este campo es requerido"
-              },
-               lugar:{
-                required: "Este campo es requerido"
-              },
-              clasificacion:{
-                required: "Este campo es requerido"
-              },
               detalle:{
                 required: "Este campo es requerido"
               },
-               causa:{
-                required: "Este campo es requerido"
-              },
-              acto:{
-                required: "Este campo es requerido"
-              },
-	            condicion:{
+              cantidad:{
                 required: "Este campo es requerido"
               }
             }
@@ -212,7 +147,7 @@ html;
        
 
           $("#btnCancel").click(function(){
-            window.location.href = "/Accidentes/";
+            window.location.href = "/EmpleadoADG/";
           });//fin del btnAdd
 
         });//fin del document.ready
@@ -221,10 +156,7 @@ html;
 
         View::set('header',$this->_contenedor->header(''));
         View::set('footer',$this->_contenedor->footer($extraFooter));
-        View::set('idColaborador',$this->getColaboradorNombre());
-        View::set('idLugar',$this->getLugarAccidente());
-        View::set('idClasificacion',$this->getCalsificacionAccidente());
-        View::render("accidentes_add");
+        View::render("EmpleadoADG_add");
     }
 
     public function AccidentesAdd(){
@@ -340,184 +272,62 @@ html;
 
           $("#edit").validate({
             rules:{
-              nombre_colaborador:{
+              ano:{
                 required: true
               },
               fecha:{
                 required: true
               },
-              trimestre:{
-                required: true
-              },
-              lugar:{
-                required: true
-              },
-	           clasificacion:{
-                required: true
-              },
               detalle:{
                 required: true
               },
-              causa:{
-                required: true
-              },
-              acto:{
-                required: true
-              },
-              condicion:{
+              cantidad:{
                 required: true
               }
             },
             messages:{
-              nombre_colaborador:{
+              ano:{
                 required: "Este campo es requerido"
               },
              fecha:{
                 required: "Este campo es requerido"
               },
-              trimestre:{
-                required: "Este campo es requerido"
-              },
-               lugar:{
-                required: "Este campo es requerido"
-              },
-              clasificacion:{
-                required: "Este campo es requerido"
-              },
               detalle:{
                 required: "Este campo es requerido"
               },
-               causa:{
-                required: "Este campo es requerido"
-              },
-              acto:{
-                required: "Este campo es requerido"
-              },
-	            condicion:{
+              cantidad:{
                 required: "Este campo es requerido"
               }
             }
           });//fin del jquery validate
 
           $("#btnCancel").click(function(){
-            window.location.href = "/Accidentes/";
+            window.location.href = "/EmpleadoADG/";
           });//fin del btnAdd
 
         });//fin del document.ready
       </script>
 html;
-        $accidente = AccidentesDao::getById($id);
-
-        $sColaborador = "";
-        foreach (AccidentesDao::getColaboradorNombre() as $key => $value) {
-            $selected = ($accidente['catalogo_colaboradores_id']==$value['catalogo_colaboradores_id'])? 'selected' : '';
-            $sColaborador .=<<<html
-        <option {$selected} value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
-html;
-        }
-        $sClasificacion = "";
-        foreach (AccidentesDao::getClasificacionrAccidente() as $key => $value) {
-            $selected = ($accidente['id_clasificacion_accidente']==$value['id_clasificacion_accidente'])? 'selected' : '';
-            $sClasificacion .=<<<html
-        <option {$selected} value="{$value['id_clasificacion_accidente']}">{$value['detalle']}</option>
-html;
-        }
-        $sLugar = "";
-        foreach (AccidentesDao::getLugarAccidente() as $key => $value) {
-            $selected = ($accidente['id_lugar_accidente']==$value['id_lugar_accidente'])? 'selected' : '';
-            $sLugar .=<<<html
-        <option {$selected} value="{$value['id_lugar_accidente']}">{$value['detalle']}</option>
-html;
-        }
-
-        View::set('sColaborador',$sColaborador);
-        View::set('sClasificacion',$sClasificacion);
-        View::set('sLugar',$sLugar);
-        View::set('accidente',$accidente);
+        $empleado = EmpleadoADGDao::getById($id);
+        $id_ = $id;
+        View::set('id_',$id_);
+        View::set('empleado',$empleado);
         View::set('header',$this->_contenedor->header(''));
         View::set('footer',$this->_contenedor->footer($extraFooter));
-        View::render("accidentes_edit");
+        View::render("empleadoADG_edit");
     }
 
-    public function AccidentesEdit(){
-        $accidente = new \stdClass();
-        $accidente->_id_accidente = MasterDom::getData('id_accidente');
-        $accidente->_catalogo_colaboradores_id = MasterDom::getData('nombre_colaborador');
+    public function EmpleadoADGEdit(){
+        $empleado = new \stdClass();
+        $empleado->_id_empleado_adg = MasterDom::getData('id_empleado_adg');
 
-        $accidente->_fecha_accidente = MasterDom::getData('fecha');
-        $fecha = MasterDom::getData('fecha');
-        $fechaEntera = strtotime($fecha);
-        $mes = date("m", $fechaEntera);
+        $descripcion = MasterDom::getData('detalle');
+        $descripcion = MasterDom::procesoAcentosNormal($descripcion);
+        $empleado->_detalle = $descripcion;
+        $empleado->_fecha = MasterDom::getData('fecha');
+        $empleado->_cantidad = MasterDom::getData('cantidad');
 
-        if($mes == '1')
-        {
-            $accidente->_trimestre = 1;
-        }
-        if($mes == '2')
-        {
-            $accidente->_trimestre = 1;
-        }
-        if($mes == '3')
-        {
-            $accidente->_trimestre = 1;
-        }
-        if($mes == '4')
-        {
-            $accidente->_trimestre = 2;
-        }
-        if($mes == '5')
-        {
-            $accidente->_trimestre = 2;
-        }
-        if($mes == '6')
-        {
-            $accidente->_trimestre = 2;
-        }
-        if($mes == '7')
-        {
-            $accidente->_trimestre = 3;
-        }
-        if($mes == '8')
-        {
-            $accidente->_trimestre = 3;
-        }
-        if($mes == '9')
-        {
-            $accidente->_trimestre = 3;
-        }
-        if($mes == '10')
-        {
-            $accidente->_trimestre = 4;
-        }
-        if($mes == '11')
-        {
-            $accidente->_trimestre = 4;
-        }
-        if($mes == '12')
-        {
-            $accidente->_trimestre = 4;
-        }
-
-        $accidente->_id_lugar_accidente = MasterDom::getData('lugar');
-
-        $detalle_accidente = MasterDom::getDataAll('detalle');
-        $detalle_accidente = MasterDom::procesoAcentosNormal($detalle_accidente);
-        $accidente->_detalle_accidente = $detalle_accidente;
-
-
-        $causa = MasterDom::getDataAll('causa');
-        $causa = MasterDom::procesoAcentosNormal($causa);
-        $accidente->_causa = $causa;
-
-        $accidente->_id_clasificacion_accidente = MasterDom::getData('clasificacion');
-        $acto_inseguro = MasterDom::getDataAll('acto');
-        $acto_inseguro = MasterDom::procesoAcentosNormal($acto_inseguro);
-        $accidente->_acto_inseguro = $acto_inseguro;
-        $condicion_insegura = MasterDom::getDataAll('condicion');
-        $condicion_insegura = MasterDom::procesoAcentosNormal($condicion_insegura);
-        $accidente->_condicion_insegura = $condicion_insegura;
-
-        $id = AccidentesDao::update($accidente);
+        $id = EmpleadoADGDao::update($empleado);
         if($id >= 1)
             $this->alerta($id,'edit');
         else
@@ -525,52 +335,77 @@ html;
 
     }
 
-    public function show($id){
+    public function Produccion($id){
         $extraFooter =<<<html
       <script>
         $(document).ready(function(){
           $("#btnCancel").click(function(){
-            window.location.href = "/Accidentes/";
+            window.location.href = "/EmpleadoADG/";
           });//fin del btnAdd
 
         });//fin del document.ready
       </script>
 html;
-        $accidente = AccidentesDao::getById($id);
-
-        $sColaborador = "";
-        foreach (AccidentesDao::getColaboradorNombre() as $key => $value) {
-            $selected = ($accidente['catalogo_colaboradores_id']==$value['catalogo_colaboradores_id'])? 'selected' : '';
-            $sColaborador .=<<<html
+        $sColaboradorAsistencia = "";
+        foreach (EmpleadoADGDao::getColaboradorAsistecia($id) as $key => $value) {
+            $selected = ($value['catalogo_colaboradores_id']==$value['nombre'])? 'selected' : '';
+            $sColaboradorAsistencia .=<<<html
         <option {$selected} value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
 html;
         }
-        $sClasificacion = "";
-        foreach (AccidentesDao::getClasificacionrAccidente() as $key => $value) {
-            $selected = ($accidente['id_clasificacion_accidente']==$value['id_clasificacion_accidente'])? 'selected' : '';
-            $sClasificacion .=<<<html
-        <option {$selected} value="{$value['id_clasificacion_accidente']}">{$value['detalle']}</option>
-html;
-        }
-        $sLugar = "";
-        foreach (AccidentesDao::getLugarAccidente() as $key => $value) {
-            $selected = ($accidente['id_lugar_accidente']==$value['id_lugar_accidente'])? 'selected' : '';
-            $sLugar .=<<<html
-        <option {$selected} value="{$value['id_lugar_accidente']}">{$value['detalle']}</option>
+
+        $id_c =$id;
+        $empleado = EmpleadoADGDao::getAllPersonal($id);
+        $tabla= '';
+        foreach ($empleado as $key => $value) {
+            $delete = $value['id_candidato_adg'];
+            $tabla.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_candidato_adg']}"/></td>
+                    <td>{$value['nombre']}</td>
+                     <td style="text-align:center; vertical-align:middle;">
+                            <button class="btn btn-danger" type="button" id="button" onclick="gt_1($delete)"><span class="fa fa-trash" style="color:white"></button>
+                      </td>
+                </tr>
 html;
         }
 
-        View::set('sColaborador',$sColaborador);
-        View::set('sClasificacion',$sClasificacion);
-        View::set('sLugar',$sLugar);
-        View::set('accidente',$accidente);
+
         View::set('header',$this->_contenedor->header(''));
+        View::set('sColaboradorAsistencia',$sColaboradorAsistencia);
+        View::set('id_c',$id_c);
+        View::set('tabla',$tabla);
         View::set('footer',$this->_contenedor->footer($extraFooter));
-        View::render("accidentes_view");
+        View::render("registro_candidato");
+    }
+
+    public function Delete(){
+
+        $dato = EmpleadoADGDao::delete($_POST['a']);
+        if($dato == 1){
+            echo "true";
+        }else{
+            echo "false";
+        }
+    }
+
+    public function CandidatoAdd(){
+        $participante = new \stdClass();
+
+        $participante->_id_candidato = MasterDom::getData('id_candidato_1');
+        $participante->_id_colaborador = MasterDom::getData('nombre_colaborador');
+
+        $id = EmpleadoADGDao::insertparticipantes($participante);
+        if ($id) {
+            echo 'success';
+
+        } else {
+            echo 'fail';
+        }
     }
 
     public function alerta($id, $parametro){
-        $regreso = "/Accidentes/";
+        $regreso = "/EmpleadoADG/";
 
         if($parametro == 'add'){
             $mensaje = "Se ha agregado correctamente";

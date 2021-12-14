@@ -37,7 +37,13 @@
                             <p class="excerpt"><span class="bi bi-building" style="color:grey"></span> | <?php echo $nombreEmpresa['nombre_empresa']; ?></p>
                         </a>
                         <a>
-                            <p class="excerpt"><span class="bi bi-credit-card" style="color:grey"></span> | <?php echo $colaborador['rfc']; ?></p>
+                            <p class="excerpt"><span class="bi bi-credit-card" style="color:grey"></span> | CURP: <?php echo $colaborador['curp']; ?></p>
+                        </a>
+                        <a>
+                            <p class="excerpt"><span class="bi bi-credit-card" style="color:grey"></span> | RFC: <?php echo $colaborador['rfc']; ?></p>
+                        </a>
+                        <a>
+                            <p class="excerpt"><span class="bi bi-credit-card" style="color:grey"></span> | IMSS: <?php echo $colaborador['imss']; ?></p>
                         </a>
 
                     </h2>
@@ -101,10 +107,7 @@
                                 <a data-toggle="tab" href="#menu4">
                                     <span class="fa fa-line-chart" style="color:gray"></span> Capacitación</a>
                             </li>
-                            <li>
-                                <a data-toggle="tab" href="#menu5">
-                                    <span class="fa fa-list-ol" style="color:gray"></span> Desempeño/Competencias</a>
-                            </li>
+
                             <li>
                                 <a data-toggle="tab" href="#menu6">
                                     <span class="fa fa-heart" style="color:gray"></span> Salud/Seguridad</a>
@@ -391,7 +394,7 @@
                             <div id="menu4" class="tab-pane fade">
                                 <br>
                                 <div class="panel-body">
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <div class="form-group col-md-6">
                                             <label>NOMBRE DE LA ÚLTIMA CAPACITACIÓN QUE ASISTIO: </label>
                                             <?=  $DatoUltimoCurso; ?>
@@ -402,12 +405,20 @@
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>¿ES INSTRUCTOR DE CAPACITACIÓN? </label>
-                                            <input type="text" class="form-control" value="<?php echo ""; ?>" disabled>
+                                            <input type="text" class="form-control" value="<?php if($EsCapacitador['numero'] >= 1)
+                                            {
+                                                echo $EsCapacitador['numero']." VEZ HA SIDO CAPACITADOR";
+                                            }
+                                            else
+                                            {
+                                                echo "ACTUALMENTE NO ES CAPACITADOR";
+                                            }?>" disabled>
                                         </div>
-
+                                        <?= $ResultadoUltimaEvaluacion; ?>
                                     </div>
-                                    <div class="col-md-6 subir-archivos">
+                                    <div class="col-md-12 subir-archivos">
                                         <div class="form-group">
+                                            <br>
                                             <label>HISTORÍA DE CAPACITACIONES REGISTRADAS CONCLUIDAS A LOS QUE HA ASISTIDO</label>
                                             <div class="row">
                                                 <div class="col-md-12">
@@ -419,8 +430,10 @@
                                                                 <th><input type="checkbox" name="checkAll" id="checkAll" value=""/></th>
                                                                 <th>Nombre de la Capacitación</th>
                                                                 <th>Fecha de Capacitación</th>
+                                                                <th>Evaluación</th>
                                                                 <th>Estatus</th>
                                                                 <th>Asistencia</th>
+                                                                <th>Calificación</th>
                                                             </tr>
                                                             </tr>
                                                             </thead>
@@ -428,6 +441,11 @@
                                                             <?=  $TablaCapacitaciones; ?>
                                                             </tbody>
                                                         </table>
+                                                        <div class="form-group col-md-5">
+                                                            <label>PROMEDIO GENERAL DE LAS EVALUACIONES: </label>
+                                                            <?=  $Promedio; ?>
+                                                        </div>
+                                                        <?=  $Promedio_E; ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -464,11 +482,11 @@
                                         <div class="form-group col-md-6">
                                             <label>El colaborador cuenta con reportes de Buenas Prácticas de Manufactura, Actas Administrativas o Reportes de Conducta
                                                 : </label>
-                                            <input type="text" class="form-control" value="<?php echo ""; ?>" disabled>
+                                            <input type="text" class="form-control" value="<?php echo $repo; ?>" disabled>
                                         </div>
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-12">
                                             <label>ÚLTIMO REPORTE REGISTRADO: </label>
-                                            <input type="text" class="form-control" value="<?php echo ""; ?>" disabled>
+                                            <input type="text" class="form-control" value="<?php echo $repor; ?>" disabled>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>El colaborador ha sido distinguido con el reconocimiento "Empleado ADG"
@@ -682,23 +700,17 @@
                                 <br>
                                 <div class="panel-body">
                                     <div class="col-md-6">
-                                        <div class="col-md-9 col-sm-9  offset-md-5">
-                                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#Modal_Datos_Personales"><i class="fa fa-edit" aria-hidden="true"></i> Editar</button>
-                                        </div>
-                                        <br>
-                                        <br>
-                                        <br>
                                         <div class="form-group col-md-12">
                                             <label>PUESTO DE ASCENDENCIA: </label>
                                             <input type="text" class="form-control" value="<?php echo $nombrePuesto['nombre']; ?>" disabled>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>ÚLTIMO PUESTO AL QUE ESTA O ESTUVO PROPUESTO:</label>
-                                            <input type="text" class="form-control" value="<?php echo ""; ?>"disabled>
+                                            <input type="text" class="form-control" value="<?php echo $AscensoUltimo['puesto']; ?>"disabled>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>TIEMPO QUE DEBE O TIENE QUE ESPERAR PARA SER ASCENDIDO: </label>
-                                            <input type="text" class="form-control" value="<?php echo ""; ?>" disabled>
+                                            <input type="text" class="form-control" value="<?php echo $AscensoUltimo['dias'];?> DÍAS" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-6 subir-archivos">
@@ -750,11 +762,13 @@
                                                                     <th>Fecha de Registro</th>
                                                                     <th>Fecha de Termino Evaluación</th>
                                                                     <th>Estatus</th>
+                                                                    <th>Descripción</th>
+                                                                    <th>Acciones</th>
                                                                 </tr>
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                <?=  $tablaCompetencias; ?>
+                                                                <?=  $tablaAscenso; ?>
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -982,7 +996,6 @@
                                         <label for="estado_civil">Estado Civil</label>
                                         <select class="form-control" name="estado_civil" id="estado_civil">
                                             <option value="" disabled selected> Selecciona el Estado Civil</option>
-                                            <?php echo $sEstado_Civil; ?>
                                             <?php echo $sOtros; ?>
                                         </select>
                                         <span id="availability_estado_civil"></span>
@@ -1237,7 +1250,7 @@
 
                                     <div class="form-group">
                                         <label for="estudios">Descripción*</label>
-                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="100" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()">
+                                        <input type="text" class="form-control" id="estudios" name="estudios" placeholder="Ej. CURSO DE DISEÑO WEB" style="text-transform:uppercase;"  onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()">
                                         <span id="availability_estudios_"></span>
                                     </div>
 

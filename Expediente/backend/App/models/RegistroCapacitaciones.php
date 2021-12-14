@@ -12,9 +12,11 @@ class RegistroCapacitaciones implements Crud{
       $mysqli = Database::getInstance();
       $query=<<<sql
         SELECT 
-               capacitaciones.id_capacitacion, capacitaciones.nombre_curso, capacitaciones.duracion, capacitaciones.horas_cubrir, capacitaciones.nombre_expositor, capacitaciones.fecha, 
+               capacitaciones.id_capacitacion, capacitaciones.nombre_curso, capacitaciones.duracion, capacitaciones.horas_cubrir, capacitaciones.fecha, 
 	            catalogo_planta.nombre AS planta,
-	            puestos.descripcion AS grupo
+	            puestos.descripcion AS grupo,
+               capacitaciones.calificacion,
+               capacitaciones.calificacion_expositor
         FROM capacitaciones, catalogo_planta, puestos
         WHERE capacitaciones.lugar = catalogo_planta.catalogo_planta_id
         AND capacitaciones.persona = puestos.id_puesto
@@ -29,9 +31,41 @@ sql;
         SELECT 
                capacitaciones.id_capacitacion, capacitaciones.nombre_curso, capacitaciones.duracion, capacitaciones.horas_cubrir, capacitaciones.nombre_expositor, capacitaciones.fecha, 
 	            catalogo_planta.nombre AS planta,
-	            puestos.descripcion AS grupo
+	            puestos.descripcion AS grupo,
+               capacitaciones.calificacion
         FROM capacitaciones, catalogo_planta, puestos
         WHERE capacitaciones.lugar = catalogo_planta.catalogo_planta_id
+        AND capacitaciones.persona = puestos.id_puesto and capacitaciones.id_capacitacion = $id 
+  
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function update_calificacion($calificacion, $idd){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      UPDATE capacitaciones SET
+        calificacion_expositor = $calificacion
+      WHERE id_capacitacion = $idd
+sql;
+        $accion = new \stdClass();
+        $accion->_sql= $query;
+        $accion->_parametros = $parametros;
+        UtileriasLog::addAccion($accion);
+        return $mysqli->update($query);
+    }
+
+    public static function getAllIDNombre($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+        SELECT 
+               capacitaciones.id_capacitacion, capacitaciones.nombre_curso, capacitaciones.duracion, capacitaciones.horas_cubrir, capacitaciones.nombre_expositor, capacitaciones.fecha, 
+	            catalogo_planta.nombre AS planta,
+	            puestos.descripcion AS grupo,
+               	CONCAT(catalogo_colaboradores.nombre," ", catalogo_colaboradores.apellido_paterno, " ", catalogo_colaboradores.apellido_materno) AS nombre
+        FROM capacitaciones, catalogo_planta, puestos, catalogo_colaboradores
+        WHERE capacitaciones.lugar = catalogo_planta.catalogo_planta_id
+       AND catalogo_colaboradores.catalogo_colaboradores_id = capacitaciones.nombre_expositor
         AND capacitaciones.persona = puestos.id_puesto and capacitaciones.id_capacitacion = $id 
   
 sql;
@@ -72,7 +106,7 @@ sql;
         $mysqli = Database::getInstance();
         $query=<<<sql
        SELECT id_capacitaciones_asistentes, ca.id_capacitacion, CONCAT(cc.nombre, " ",cc.apellido_paterno, " ", cc.apellido_materno)
-AS nombre, ca.fecha_alta, cc.identificador_noi AS planta, cp.nombre AS puesto
+AS nombre, ca.fecha_alta, cc.identificador_noi AS planta, cp.nombre AS puesto, ca.calificacion
 FROM capacitaciones_asistentes ca
 INNER JOIN catalogo_colaboradores cc ON ca.id_colaborador = cc.catalogo_colaboradores_id
 INNER JOIN catalogo_puesto cp ON cp.catalogo_puesto_id = cc.catalogo_puesto_id
@@ -127,7 +161,7 @@ sql;
 	    $mysqli = Database::getInstance();
       $query=<<<sql
       INSERT INTO capacitaciones
-      VALUES (NULL, :nombre_curso,:duracion, :horas_cubrir, :nombre_expositor, :fecha, :lugar, :puesto);
+      VALUES (NULL, :nombre_curso,:duracion, :horas_cubrir, :nombre_expositor, :fecha, :lugar, :puesto, :calificacion, null);
 sql;
         $parametros = array(
           ':nombre_curso' => $registro->_nombre_curso,
@@ -136,7 +170,8 @@ sql;
           ':lugar' => $registro->_lugar,
           ':puesto' => $registro->_puesto,
           ':duracion' => $registro->_duracion,
-          ':horas_cubrir' => $registro->_horas
+          ':horas_cubrir' => $registro->_horas,
+          ':calificacion' => $registro->_calificacion
         );
         $id = $mysqli->insert($query,$parametros);
         $accion = new \stdClass();
@@ -152,7 +187,7 @@ sql;
         $mysqli = Database::getInstance();
         $query=<<<sql
       INSERT INTO capacitaciones_asistentes
-      VALUES (NULL, :id_capacitacion,:id_colaborador, :fecha_alta, 0);
+      VALUES (NULL, :id_capacitacion,:id_colaborador, :fecha_alta, 0, null);
 sql;
         $parametros = array(
             ':id_capacitacion' => $participante->_id_capacitacion,
@@ -169,14 +204,17 @@ sql;
         return $id;
     }
 
-    public static function AsistenciaParticipantesUpdate($participante){
+    public static function AsistenciaParticipantesUpdate($participante, $calificacion){
         $mysqli = Database::getInstance();
         $query=<<<sql
         UPDATE capacitaciones_asistentes
-        SET asistencia = 1 WHERE id_capacitaciones_asistentes = :id_capacitacion
+        SET asistencia = 1,
+        calificacion = :calificacion
+        WHERE id_capacitaciones_asistentes = :id_capacitacion
 sql;
         $parametros = array(
-            ':id_capacitacion' => $participante
+            ':id_capacitacion' => $participante,
+            ':calificacion' => $calificacion
         );
         $id = $mysqli->insert($query,$parametros);
         $accion = new \stdClass();
@@ -193,7 +231,6 @@ sql;
       $query=<<<sql
       UPDATE capacitaciones SET
         nombre_curso = :nombre_curso,
-        nombre_expositor = :nombre_expositor,
         fecha = :fecha,
         lugar = :lugar,
         persona = :persona
@@ -201,7 +238,6 @@ sql;
 sql;
         $parametros = array(
             ':nombre_curso' => $registro->_nombre_curso,
-            ':nombre_expositor' => $registro->_nombre_expositor,
             ':fecha' => $registro->_fecha,
             ':lugar' => $registro->_lugar,
             ':persona' => $registro->_persona,
@@ -246,6 +282,14 @@ AND capacitaciones.persona = puestos.id_puesto
 AND capacitaciones.id_capacitacion= $id
 sql;
         return $mysqli->queryOne($query);
+    }
+
+    public static function getColaboradorNombreExpositor(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      SELECT catalogo_colaboradores_id, CONCAT(nombre, " ", apellido_paterno, " ", apellido_materno) AS nombre FROM catalogo_colaboradores WHERE STATUS = 1  ORDER BY nombre ASC
+sql;
+        return $mysqli->queryAll($query);
     }
 
     public static function getColaboradorNombre($id){
@@ -312,10 +356,13 @@ sql;
         return $mysqli->queryAll($query);
     }
 
-    public static function getClasificacionrAccidente(){
+    public static function getColaboradoresExpositor(){
         $mysqli = Database::getInstance();
         $query=<<<sql
-      SELECT * FROM catalogo_clasificacion_accidente ORDER BY detalle ASC
+      SELECT cc.catalogo_colaboradores_id, CONCAT(cc.nombre, " ", cc.apellido_paterno, " ", cc.apellido_materno) AS nombre 
+      FROM catalogo_colaboradores cc
+      WHERE STATUS = 1
+      ORDER BY nombre ASC
 sql;
         return $mysqli->queryAll($query);
     }

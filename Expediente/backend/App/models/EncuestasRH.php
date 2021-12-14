@@ -25,8 +25,114 @@ sql;
       $query=<<<sql
      SELECT ca.id_cuestionario_activo, c.nombre, ca.fecha_inicio, ca.fecha_fin, ca.fecha_activacion, ca.trimestre, ca.comentario, ca.estatus
 FROM cuestionarios_activos ca
-INNER JOIN cuestionario c ON c.id_cuestionario = ca.id_cuestionario where c.id_cuestionario <> 1 and  c.id_cuestionario <> 5 order by fecha_inicio
+INNER JOIN cuestionario c ON c.id_cuestionario = ca.id_cuestionario where c.id_cuestionario <> 1 and  c.id_cuestionario <> 5 and  c.id_cuestionario <> 6  order by fecha_inicio
   
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+    public static function getAllComunicacionOrganizacional(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT ca.id_cuestionario_activo, c.nombre, ca.fecha_inicio, ca.fecha_fin, ca.fecha_activacion, ca.trimestre, ca.comentario, ca.estatus
+FROM cuestionarios_activos ca
+INNER JOIN cuestionario c ON c.id_cuestionario = ca.id_cuestionario where c.id_cuestionario = 2 order by fecha_inicio desc
+  
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+    public static function getAllComunicacion(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT ca.id_cuestionario_activo, c.nombre, ca.fecha_inicio, ca.fecha_fin, ca.fecha_activacion, ca.trimestre, ca.comentario, ca.estatus
+FROM cuestionarios_activos ca
+INNER JOIN cuestionario c ON c.id_cuestionario = ca.id_cuestionario where c.id_cuestionario = 3 order by fecha_inicio desc
+  
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+    public static function getAllClimaLaboral(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT ca.id_cuestionario_activo, c.nombre, ca.fecha_inicio, ca.fecha_fin, ca.fecha_activacion, ca.trimestre, ca.comentario, ca.estatus
+FROM cuestionarios_activos ca
+INNER JOIN cuestionario c ON c.id_cuestionario = ca.id_cuestionario where c.id_cuestionario = 4 order by fecha_inicio desc
+  
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+    public static function getAllIngreso(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT ca.id_cuestionario_colaborador, ca.id_colaborador, CONCAT(ccc.nombre, " ", ccc.apellido_paterno, " ", ccc.apellido_materno) AS nombre, ccc.fecha_alta, 1 AS resuelto
+FROM cuestionario_colaborador ca
+INNER JOIN cuestionario c ON c.id_cuestionario = ca.id_cuestionario_activo
+INNER JOIN cuestionario_ingreso_adg cia ON cia.id_cuestionario_colaborador = ca.id_cuestionario_colaborador
+INNER JOIN catalogo_colaboradores ccc ON ccc.catalogo_colaboradores_id = ca.id_colaborador
+WHERE c.id_cuestionario = 1
+UNION
+SELECT ca.id_cuestionario_colaborador, ca.id_colaborador, CONCAT(ccc.nombre, " ", ccc.apellido_paterno, " ", ccc.apellido_materno) AS nombre, ccc.fecha_alta, 0 AS resuelto
+FROM cuestionario_colaborador ca, catalogo_colaboradores ccc
+WHERE NOT EXISTS (SELECT NULL 
+			FROM cuestionario_ingreso_adg cia, cuestionario c
+			WHERE cia.id_cuestionario_colaborador = ca.id_cuestionario_colaborador
+			AND c.id_cuestionario = ca.id_cuestionario_activo
+			AND c.id_cuestionario = 1
+			)		AND ca.id_colaborador = ccc.catalogo_colaboradores_id
+			
+			
+
+  
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+    public static function getAllSalida(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT ca.id_cuestionario_colaborador, ca.id_colaborador, CONCAT(ccc.nombre, " ", ccc.apellido_paterno, " ", ccc.apellido_materno) AS nombre, ccc.fecha_baja, 1 AS resuelto, ccc.status
+FROM cuestionario_colaborador ca
+INNER JOIN cuestionario c ON c.id_cuestionario = ca.id_cuestionario_activo
+INNER JOIN cuestionario_salida_adg cia ON cia.id_cuestionario_colaborador = ca.id_cuestionario_colaborador
+INNER JOIN catalogo_colaboradores ccc ON ccc.catalogo_colaboradores_id = ca.id_colaborador
+WHERE c.id_cuestionario = 5 AND ccc.status = 3
+UNION
+SELECT ca.id_cuestionario_colaborador, ca.id_colaborador, CONCAT(ccc.nombre, " ", ccc.apellido_paterno, " ", ccc.apellido_materno) AS nombre, ccc.fecha_baja, 0 AS resuelto,  ccc.status
+FROM cuestionario_colaborador ca, catalogo_colaboradores ccc
+WHERE NOT EXISTS (SELECT NULL 
+			FROM cuestionario_salida_adg cia, cuestionario c
+			WHERE cia.id_cuestionario_colaborador = ca.id_cuestionario_colaborador
+			AND c.id_cuestionario = ca.id_cuestionario_activo
+			AND c.id_cuestionario = 5 AND ccc.status = 3
+			) AND ca.id_colaborador = ccc.catalogo_colaboradores_id 
+  AND ccc.status = 3 AND ccc.fecha_baja != '0000-00-00'
+
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+    public static function getAllInduccion(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT ca.id_cuestionario_colaborador, ca.id_colaborador, CONCAT(ccc.nombre, " ", ccc.apellido_paterno, " ", ccc.apellido_materno) AS nombre, ccc.fecha_alta, 1 AS resuelto, ccc.status
+FROM cuestionario_colaborador ca
+INNER JOIN cuestionario c ON c.id_cuestionario = ca.id_cuestionario_activo
+INNER JOIN induccion_adg cia ON cia.id_cuestionario_colaborador = ca.id_cuestionario_colaborador
+INNER JOIN catalogo_colaboradores ccc ON ccc.catalogo_colaboradores_id = ca.id_colaborador
+WHERE c.id_cuestionario = 6
+UNION
+SELECT ca.id_cuestionario_colaborador, ca.id_colaborador, CONCAT(ccc.nombre, " ", ccc.apellido_paterno, " ", ccc.apellido_materno) AS nombre, ccc.fecha_alta, 0 AS resuelto,  ccc.status
+FROM cuestionario_colaborador ca, catalogo_colaboradores ccc
+WHERE NOT EXISTS (SELECT NULL 
+			FROM induccion_adg cia, cuestionario c
+			WHERE cia.id_cuestionario_colaborador = ca.id_cuestionario_colaborador
+			AND c.id_cuestionario = ca.id_cuestionario_activo
+			AND c.id_cuestionario = 6
+			)		AND ca.id_colaborador = ccc.catalogo_colaboradores_id
+
 sql;
         return $mysqli->queryAll($query);
     }
@@ -76,6 +182,26 @@ sql;
           ':fecha_activacion' => $encuestas->_fecha_activacion,
           ':trimestre' => $encuestas->_trimestre,
           ':comentario' => $encuestas->_comentario
+        );
+        $id = $mysqli->insert($query,$parametros);
+        $accion = new \stdClass();
+        $accion->_sql= $query;
+        $accion->_parametros = $parametros;
+        $accion->_id = $id;
+
+        UtileriasLog::addAccion($accion);
+        return $id;
+    }
+
+    public static function insertEncuestasComunicacionOrganizacional($encuestas){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      INSERT INTO cuestionario_colaborador
+      VALUES (NULL, :id_cuestionario_activo, :id_colaborador, 0);
+sql;
+        $parametros = array(
+            ':id_cuestionario_activo' => $encuestas->_id_encuesta,
+            ':id_colaborador' => $encuestas->_nombre_colaborador
         );
         $id = $mysqli->insert($query,$parametros);
         $accion = new \stdClass();
@@ -146,7 +272,23 @@ sql;
     public static function getTipoEncuesta(){
         $mysqli = Database::getInstance();
         $query=<<<sql
-    SELECT * FROM cuestionario WHERE id_cuestionario <> 1 AND id_cuestionario <> 5 
+    SELECT * FROM cuestionario WHERE id_cuestionario <> 1 AND id_cuestionario <> 5 and id_cuestionario <> 6 
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+    public static function getColaboradorNombre($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT cc.catalogo_colaboradores_id, CONCAT(cc.nombre, " ", cc.apellido_paterno, " ", cc.apellido_materno) AS nombre 
+      FROM catalogo_colaboradores cc
+      WHERE cc.catalogo_colaboradores_id NOT IN (
+      
+      SELECT co.id_cuestionario_colaborador FROM comunicacion_organizacional co
+      INNER JOIN cuestionario_colaborador cco ON cco.id_cuestionario_colaborador = co.id_cuestionario_colaborador
+      WHERE co.id_cuestionario_colaborador  = $id)
+      AND STATUS = 1
+      ORDER BY nombre ASC
 sql;
         return $mysqli->queryAll($query);
     }

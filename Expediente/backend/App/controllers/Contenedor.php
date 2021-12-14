@@ -235,18 +235,23 @@ if($admin['perfil_id'] == 6){
                    
                    <li><a>Reportes<span class="fa fa-chevron-down"></span></a> 
                       <ul class="nav child_menu">    
-                        <li><a href="/Reportes/">Conducta, bpm's, Actas Administrativas</a></li>
+                        <li><a href="/Reportes/">Conducta, BPM's, Actas Administrativas</a></li>
                       </ul>
                    </li>
 
                     <li><a>Proyectos de Mejora<span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
-                        <li><a href="/Baja/">Registros Activos</a></li>
+                        <li><a href="/ProyectosMejora/">Registros Activos</a></li>
                       </ul>
                    </li>  
                    <li><a>Premios e Insignias<span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
                         <li><a href="/EmpleadoADG/">Empleado ADG</a></li>
+                      </ul>
+                   </li>  
+                    <li><a>Evaluación 360°<span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li><a href="/Matriz/">Matriz</a></li>
                       </ul>
                    </li>  
 

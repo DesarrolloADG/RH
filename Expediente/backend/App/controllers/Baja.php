@@ -96,7 +96,7 @@ html;
         $tabla= '';
         $tabla_semanal= '';
         foreach ($baja as $key => $value) {
-            $check = $value['lista{'];
+            $check = $value['lista'];
             $check_tabla = "";
             $cuestionario_salida = $value['cuestionario_salida'];
             $cuestionario_tabla = "";
@@ -159,8 +159,8 @@ html;
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_baja']}"/></td>
                     <td>{$value['nombre']}</td>
                     <td>$Tipo_Empleado</td>
-                    <td>{$value['fecha_inicio']}</td>
-                    <td>{$value['fecha_termino']}</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha_inicio']}</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha_termino']}</td>
                     <td>$cuestionario_tabla</td>
                     <td>$check_tabla</td>
                   
@@ -232,8 +232,8 @@ html;
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_baja']}"/></td>
                     <td>{$value['nombre']}</td>
                     <td>$Tipo_Empleado</td>
-                    <td>{$value['fecha_inicio']}</td>
-                    <td>{$value['fecha_termino']}</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha_inicio']}</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha_termino']}</td>
                     <td>$cuestionario_tabla</td>
                     <td>$check_tabla</td>
                   
@@ -306,39 +306,6 @@ html;
                 ).draw();
             });
 
-            $(document).on("change","#identificador",function(e){
-              e.stopPropagation();//evita que se ejecute 2 veces el mismo evento
-              $.ajax({
-                url:'/Colaboradores/getTablaOperaciones/',
-                type:'POST',
-                data:{"identificador": $(this).val()},
-                success:function(response){
-                  $("#tabla_muestra").html(response);
-                  $('#muestra-cupones').DataTable({
-                        "columnDefs": [{
-                            "orderable": false,
-                            "targets": 0
-                        }],
-                         "order": false,
-                         "language": {
-                            "emptyTable": "No hay datos disponibles",
-                            "infoEmpty": "Mostrando 0 a 0 de 0 registros",
-                            "info": "Mostrar _START_ a _END_ de _TOTAL_ registros",
-                            "infoFiltered":   "(Filtrado de _MAX_ total de registros)",
-                            "lengthMenu": "Mostrar _MENU_ registros",
-                            "zeroRecords":  "No se encontraron resultados",
-                            "search": "Buscar:",
-                            "processing": "Procesando...",
-                            "paginate" : {
-                                "next": "Siguiente",
-                                "previous" : "Anterior"
-                            }
-                        }
-                    });//fin del dataTable
-                }
-              });//fin del ajax
-            });//fin del evento change de #identificador
- 
         });//fin del document ready
       </script>
 html;

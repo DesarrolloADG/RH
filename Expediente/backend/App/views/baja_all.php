@@ -122,8 +122,6 @@
         var xhttp = new XMLHttpRequest();
 
         $('#availability1').html('');
-        $('#availability2').html('');
-        $('#availability3').html('');
         $('#availability4').html('');
         if(!document.getElementById("title").value.length)
         {

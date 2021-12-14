@@ -19,7 +19,7 @@
                                                                                     </span>
                                                         </div>
                                                         <div class="panel-body">
-                                                            <div class="col-md-7">
+                                                            <div class="col-md-12">
                                                                 <div class="form-group">
 
                                                                     <label for="nombre_colaborador">Nombre del Colaborador que solicito el Día Económico<span class="required">:</span></label>
@@ -71,76 +71,7 @@
                                                                 </div>
 
                                                             </div>
-                                                            <div class="col-md-5 subir-archivos">
-                                                                <div class="form-group">
-                                                                    <label>Subir archivos</label>
-                                                                    <div class="input-group">
-                                                                        <input placeholder="" type="text" class="form-control carga-archivo-filename" disabled="disabled">
-                                                                        <!-- don't give a name === doesn't send on POST/GET -->
-                                                                        <span class="input-group-btn">
-                                                                            <!-- image-preview-input -->
-                                                                            <div class="btn btn-default carga-archivo-input">
-                                                                                <span class="glyphicon glyphicon-folder-open"></span>
-                                                                                <span class="carga-archivo-input-title">Seleccionar archivo</span>
-                                                                                <input type="file" accept="image/png, image/jpeg, image/gif" name="input-file-preview" />
-                                                                                <!-- rename it -->
-                                                                            </div>
-                                                                         </span>
-                                                                    </div>
-                                                                </div>
 
-                                                                <div class="form-group">
-                                                                    <div class="input-group image-preview">
-                                                                        <input placeholder="" type="text" class="form-control carga-archivo-filename" disabled="disabled">
-                                                                        <span class="input-group-btn">
-                                                                            <div class="btn btn-default carga-archivo-input">
-                                                                                <span class="glyphicon glyphicon-folder-open"></span>
-                                                                                <span class="carga-archivo-input-title">Seleccionar archivo</span>
-                                                                                <input type="file" accept="image/png, image/jpeg, image/gif" name="input-file-preview" />
-                                                                            </div>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <div class="input-group image-preview">
-                                                                        <input placeholder="" type="text" class="form-control carga-archivo-filename" disabled="disabled">
-                                                                        <span class="input-group-btn">
-                                                                            <div class="btn btn-default carga-archivo-input">
-                                                                                <span class="glyphicon glyphicon-folder-open"></span>
-                                                                                <span class="carga-archivo-input-title">Seleccionar archivo</span>
-                                                                                <input type="file" accept="image/png, image/jpeg, image/gif" name="input-file-preview" />
-                                                                            </div>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <div class="input-group image-preview">
-                                                                        <input placeholder="" type="text" class="form-control carga-archivo-filename" disabled="disabled">
-                                                                        <span class="input-group-btn">
-                                                                            <div class="btn btn-default carga-archivo-input">
-                                                                                <span class="glyphicon glyphicon-folder-open"></span>
-                                                                                <span class="carga-archivo-input-title">Seleccionar archivo</span>
-                                                                                <input type="file" accept="image/png, image/jpeg, image/gif" name="input-file-preview" />
-                                                                            </div>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="col-md-6">
-                                                                        <div class="col-md-6">
-                                                                            Espacio utilizado
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            523.0 KB
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <a class="btn btn-primary btn-block" href="#">Subir archivo</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
                                                         </div>
                                                     </div>
 

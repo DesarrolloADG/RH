@@ -23,7 +23,7 @@
                                                             <div class="x_content">
 
                                                                 <div class="form-group col-md-6">
-                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="nombre_curso">Nombre del Curso<span class="required">*</span></label>
+                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="nom_cur">Nombre del Curso<span class="required">*</span></label>
                                                                     <div class="col-md-8 col-sm-6 col-xs-12">
                                                                         <input type="textarea" name="nom_cur" id="nom_cur" class="form-control col-md-7 col-xs-12" placeholder="Ej. PRIMEROS AUXILIOS">
                                                                     </div>
@@ -36,7 +36,6 @@
                                                                     </div>
                                                                 </div>
 
-
                                                                 <div class="form-group col-md-6">
                                                                     <label class="control-label col-md-4 col-sm-3 col-xs-12" for="horas">Horas a cubrir<span class="required">*</span></label>
                                                                     <div class="col-md-8 col-sm-6 col-xs-12">
@@ -45,9 +44,14 @@
                                                                 </div>
 
                                                                 <div class="form-group col-md-6">
-                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="nombre_expositor">Nombre del Expositor<span class="required">*</span></label>
+                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="nom_exp">Nombre del Expositor<span class="required">*</span></label>
                                                                     <div class="col-md-8 col-sm-6 col-xs-12">
-                                                                        <input type="text" name="nom_exp" id="nom_exp" class="form-control col-md-7 col-xs-12" placeholder="Ej. ALEXANDER OROZCO">
+                                                                        <select class="form-control" name="nom_exp" id="nom_exp">
+                                                                            <option value="" disabled selected>Selecciona un Expositor</option>
+                                                                            <option value="000">EXPOSITOR EXTERNO</option>
+                                                                            <?php echo $idExpositor; ?>
+                                                                        </select>
+                                                                        <span id="availability1"></span>
                                                                     </div>
                                                                 </div>
 
@@ -59,7 +63,7 @@
                                                                 </div>
 
                                                                 <div class="form-group col-md-6">
-                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="nombre_expositor">Planta<span class="required">*</span></label>
+                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="lugar">Planta<span class="required">*</span></label>
                                                                     <div class="col-md-8 col-sm-6 col-xs-12">
                                                                         <select class="form-control" name="lugar" id="lugar">
                                                                             <option value="" disabled selected>Selecciona una Planta</option>
@@ -69,11 +73,22 @@
                                                                 </div>
 
                                                                 <div class="form-group col-md-6">
-                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="puestos">Personal<span class="required">*</span></label>
+                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="puesto">Personal<span class="required">*</span></label>
                                                                     <div class="col-md-8 col-sm-6 col-xs-12">
                                                                         <select class="form-control" name="puesto" id="puesto">
-                                                                            <option value="" disabled selected>Selecciona el personal</option>
+                                                                            <option value="" disabled selected>Selecciona el Personal</option>
                                                                             <?php echo $idPuesto; ?>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group col-md-6">
+                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="calificacion">Tendrán Alguna Calificación<span class="required">*</span></label>
+                                                                    <div class="col-md-8 col-sm-6 col-xs-12">
+                                                                        <select class="form-control" name=calificacion id=calificacion">
+                                                                            <option value="" disabled selected>Selecciona si Incluiran Calificaciones</option>
+                                                                            <option value="0">Si Incluiran</option>
+                                                                            <option value="1">No Incluiran</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>

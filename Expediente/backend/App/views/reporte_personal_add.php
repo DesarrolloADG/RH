@@ -58,7 +58,7 @@
                                                                     <div class="col-md-8 col-sm-6 col-xs-12">
                                                                         <select class="form-control" name="jefe" id="jefe">
                                                                             <option value="" disabled selected>Nombre del Jefe Inmediato</option>
-                                                                            <?php echo $idColaborador; ?>
+                                                                            <?php echo $idColaboradorJefes; ?>
                                                                         </select>
                                                                     </div>
                                                                 </div>
@@ -68,10 +68,10 @@
                                                                     <div class="col-md-7 col-sm-6 col-xs-12">
                                                                         <select class="form-control" name="supervisor" id="supervisor">
                                                                             <option value="" disabled selected>Nombre del Supervisor</option>
-                                                                            <?php echo $idColaborador; ?>
+                                                                            <?php echo $idColaboradorJefes; ?>
                                                                         </select>
                                                                     </div>
-                                                                </div>   
+                                                                </div>
 
                                                                 <div class="form-group col-md-5">
                                                                     <label class="control-label col-md-4 col-sm-3 col-xs-12" for="reporta">Nombre de Quien Reporta<span class="required">*</span></label>
@@ -94,6 +94,13 @@
                                                                     <label class="control-label col-md-4 col-sm-3 col-xs-12" for="check">Indique sí ha Habido Reincidencia de Este Evento:<span class="required">*</span></label>
                                                                     <div class="col-md-1 col-sm-6 col-xs-12">
                                                                         <input type="checkbox" name="check" id="check" class="form-control col-md-5 col-xs-12" placeholder="1">
+                                                                    </div>
+                                                                    <span id="availability"></span>
+                                                                </div>
+                                                                <div class="form-group col-md-12">
+                                                                    <label class="control-label col-md-4 col-sm-3 col-xs-12" for="check-grave">Fue Grave el Reporte:<span class="required">*</span></label>
+                                                                    <div class="col-md-1 col-sm-6 col-xs-12">
+                                                                        <input type="checkbox" name="check-grave" id="check-grave" class="form-control col-md-5 col-xs-12" placeholder="1">
                                                                     </div>
                                                                     <span id="availability"></span>
                                                                 </div>

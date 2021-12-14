@@ -34,6 +34,33 @@ sql;
         return $mysqli->queryAll($query);
     }
 
+    public static function getTotalIncapacidades(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+      SELECT COUNT(*) AS total FROM incapacidades WHERE YEAR(fecha_inicio) = DATE_FORMAT(DATE_SUB(NOW(),
+     INTERVAL 1 YEAR), '%Y')
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getTotalIncapacidadesADG(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT COUNT(*) AS total FROM incapacidades
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getTotalIncapacidadesTrimestre(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT COUNT(*) AS total_trimestre FROM incapacidades WHERE 
+     YEAR(fecha_inicio) = YEAR(CURDATE()) AND QUARTER(fecha_inicio) = QUARTER(CURDATE())
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+
 
     public static function insert($incapacidad){
 	    $mysqli = Database::getInstance();

@@ -84,7 +84,8 @@ sql;
     public static function getRegistroCapacitaciones($id){
         $mysqli = Database::getInstance();
         $query=<<<sql
-        SELECT ca.id_colaborador, c.nombre_curso, c.fecha, ca.asistencia 
+        SELECT ca.id_colaborador, c.nombre_curso, c.fecha, ca.asistencia, c.calificacion as requierecal,
+               ca.calificacion
         FROM capacitaciones_asistentes ca
         INNER JOIN capacitaciones c ON ca.id_capacitacion = c.id_capacitacion
         WHERE ca.id_colaborador = $id AND c.fecha <= CURDATE() ORDER BY fecha DESC;
@@ -474,8 +475,8 @@ sql;
         numero_identificador = :numero_identificador,
         rfc = :rfc,
         catalogo_empresa_id = :catalogo_empresa_id,
-	catalogo_lector_id = :catalogo_lector_id,
-	catalogo_lector_secundario_id = :catalogo_lector_secundario_id,
+	    catalogo_lector_id = :catalogo_lector_id,
+	    catalogo_lector_secundario_id = :catalogo_lector_secundario_id,
         catalogo_ubicacion_id = :catalogo_ubicacion_id,
         catalogo_departamento_id = :catalogo_departamento_id,
         catalogo_puesto_id = :catalogo_puesto_id,
@@ -646,14 +647,16 @@ sql;
       $query=<<<sql
       SELECT
         c.*,
-        s.nombre AS status
+        s.nombre AS STATUS,onn.imss, onn.curp
       FROM catalogo_colaboradores c
       JOIN catalogo_status s
       ON c.status = s.catalogo_status_id
-      WHERE c.catalogo_colaboradores_id = $id
+      INNER JOIN operacion_noi onn ON onn.clave = c.clave_noi
+      WHERE onn.identificador = c.identificador_noi AND c.catalogo_colaboradores_id = $id 
 sql;
       return $mysqli->queryOne($query);
     }
+
 
     public static function getByIdOtro($id){
         $mysqli = Database::getInstance();
@@ -874,7 +877,11 @@ SELECT t1.* FROM operacion_noi t1 LEFT JOIN catalogo_colaboradores t2 ON t2.clav
 sql;
 */
 	$query=<<<sql
-SELECT t1.* FROM operacion_noi t1 LEFT JOIN catalogo_colaboradores t2 ON (t2.clave_noi = t1.clave AND t1.identificador = t2.identificador_noi) WHERE t1.status != 'B' AND catalogo_colaboradores_id IS NULL $filtro GROUP BY operacion_noi_id ORDER BY `t1`.`nombre` ASC
+SELECT t1.* FROM operacion_noi t1 LEFT JOIN 
+    catalogo_colaboradores t2 ON
+        (t2.clave_noi = t1.clave AND t1.identificador = t2.identificador_noi) 
+WHERE t1.status != 'B' AND catalogo_colaboradores_id IS NULL $filtro 
+GROUP BY operacion_noi_id ORDER BY `t1`.`nombre` ASC
 sql;
         return $mysqli->queryAll($query);
       }
@@ -926,6 +933,18 @@ sql;
 SELECT ccc.id_competencia_colaborador, cc.nombre, ccc.catalogo_colaboradores_id
 FROM competencias_colaborador ccc
 INNER JOIN catalogo_competencias cc ON cc.catalogo_competencia_id = ccc.catalogo_competencia_id
+WHERE catalogo_colaboradores_id = $id;
+sql;
+        return $mysqli->queryAll($query);
+    }
+
+    public static function getAscensoAll($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+                       
+SELECT a.id_ascenso,cp.descripcion as puesto , a.fecha_registro, a.fecha_termino, a.estatus, a.descripcion
+FROM ascenso a
+INNER JOIN catalogo_puesto cp ON a.catalogo_puesto_id = cp.catalogo_puesto_id
 WHERE catalogo_colaboradores_id = $id;
 sql;
         return $mysqli->queryAll($query);
@@ -1126,6 +1145,27 @@ sql;
 sql;
         return $mysqli->queryOne($query);
     }
+
+    public static function getPromedio($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT ROUND((SELECT SUM(calificacion)AS calificacion FROM capacitaciones_asistentes WHERE id_colaborador = $id)
+/(SELECT COUNT(*) FROM capacitaciones c
+INNER JOIN capacitaciones_asistentes ca ON ca.id_capacitacion = c.id_capacitacion
+WHERE id_colaborador = $id AND CURDATE()>= c.fecha),2) AS promedio 
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getPromedioE($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT ROUND((SELECT SUM(calificacion_expositor)AS calificacion_expositor FROM capacitaciones WHERE nombre_expositor = $id AND calificacion = 1 AND CURDATE()>= fecha)
+/(SELECT COUNT(*) FROM capacitaciones WHERE calificacion = 1
+AND nombre_expositor = $id AND CURDATE()>= fecha),2) AS promedio 
+sql;
+        return $mysqli->queryOne($query);
+    }
       public static function getMotivoById($id){
         $mysqli = Database::getInstance();
         $query=<<<sql
@@ -1141,6 +1181,57 @@ sql;
 sql;
         return $mysqli->queryAll($query);
       }
+
+    public static function getAscensoAllUltimo($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT a.id_ascenso,cp.descripcion AS puesto , a.fecha_registro, a.fecha_termino, a.estatus, a.descripcion, TIMESTAMPDIFF(DAY, a.fecha_registro, a.fecha_termino) AS dias
+FROM ascenso a
+INNER JOIN catalogo_puesto cp ON a.catalogo_puesto_id = cp.catalogo_puesto_id
+WHERE catalogo_colaboradores_id = $id ORDER BY fecha_termino DESC LIMIT 1
+
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getCapacitador($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT COUNT(*) AS numero FROM capacitaciones WHERE nombre_expositor = $id
+
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getUltimaEvaluacion($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT * FROM capacitaciones WHERE nombre_expositor = $id AND CURDATE()>=fecha and calificacion = 1 ORDER BY fecha DESC LIMIT 1
+
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getTieneReportes($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT COUNT(*) AS numero FROM reportes WHERE catalogo_colaboradores_id_reportado = $id
+
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getUltimoReporte($id){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+SELECT r.fecha_alta, tr.descripcion FROM reportes r
+INNER JOIN tipo_reporte tr ON tr.id_tipo_reporte = r.id_tipo_reporte
+WHERE r.catalogo_colaboradores_id_reportado = $id ORDER BY r.fecha_alta DESC
+
+sql;
+        return $mysqli->queryOne($query);
+    }
+
     public static function insert_documento($documento){
         $mysqli = Database::getInstance();
         $query=<<<sql

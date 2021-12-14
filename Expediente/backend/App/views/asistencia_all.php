@@ -58,9 +58,9 @@
                         </div>
                         <form enctype="multipart/form-data" id="form_colaboradores">
                             <div class="x_content">
-                                <div class="form-group col-md-9">
-                                    <label class="control-label col-md-7 col-sm-3 col-xs-12" for="nombre_colaborador">Nombre del Colaborador Registrado desde Asistentes<span class="required">*</span></label>
-                                    <div class="col-md-8 col-sm-6 col-xs-12">
+                                <div class="form-group col-md-5">
+                                    <label class="control-label col-md-12 col-sm-3 col-xs-12" for="nombre_colaborador">Nombre del Colaborador Registrado desde Asistentes<span class="required">*</span></label>
+                                    <div class="col-md-12 col-sm-6 col-xs-12">
                                         <select class="form-control" name="nombre_colaborador" id="nombre_colaborador">
                                             <option value="" disabled selected>Selecciona un Colaborador</option>
                                             <?php echo $sColaboradorAsistencia; ?>
@@ -68,20 +68,20 @@
                                         <span id="availability1"></span>
                                     </div>
                                 </div>
+                                <?php echo $calificacion_campo; ?>
+
                                 <div class="row">
-                                    <div class="col-md-4"></div>
-                                    <div class="col-md-4 text-center">
+                                    <div class="col-md-1 text-center">
                                         <br>
                                         <button class="btn btn-success" type="button" id="buttonSearch" onclick="gt()">Registrar Asistencia</button>
                                     </div>
-                                    <div class="col-md-4"></div>
                                 </div>
                             </div>
                         </form>
                         <form enctype="multipart/form-data" id="form_id">
                             <div class="x_content">
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="id_capacitacion_asistente" name="id_capacitacion_asistente">
+                                    <input type="hidden" class="form-control" id="id_capacitacion_asistente" name="id_capacitacion_asistente">
                                 </div>
                             </div>
                         </form>
@@ -101,6 +101,7 @@
                                     <th>Fecha de Alta</th>
                                     <th>Planta</th>
                                     <th>Su Puesto</th>
+                                    <th>Calificación</th>
                                     <th id="acciones">Acciones</th>
                                 </tr>
                                 </thead>

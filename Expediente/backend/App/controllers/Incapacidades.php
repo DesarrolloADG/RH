@@ -147,9 +147,14 @@ class Incapacidades extends Controller{
         $('#efirstname').val(id);
 	});
 });
+                    
       </script>
 html;
         $usuario = $this->__usuario;
+        $total_incapacidades = IncapacidadesDao::getTotalIncapacidades();
+        $total_incapacidadesADG = IncapacidadesDao::getTotalIncapacidadesADG();
+        $total_incapacidadesTrimestre = IncapacidadesDao::getTotalIncapacidadesTrimestre();
+
         $incapacidades = IncapacidadesDao::getAll();
         $editarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 5)==1)?  "" : "style=\"display:none;\"";
         $eliminarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 6)==1)? "" : "style=\"display:none;\"";
@@ -184,7 +189,7 @@ html;
                     <td>$estatus</td>
                     <td class="center" >
                         <a href="/Incapacidades/Edit/{$value['id_incapacidad']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
-                        <a href="/Incapacidades/Documentacion/{$value['id_incapacidad']}" type="submit" name="id_incapacidad" class="btn btn-info"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
+                        <a href="/Incapacidades/Documentacion/{$value['id_incapacidad']}" type="submit" name="id_incapacidad" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
                     </td>
                 </tr>
 html;
@@ -200,6 +205,9 @@ html;
         View::set('editarHidden',$editarHidden);
         View::set('eliminarHidden',$eliminarHidden);
         View::set('tabla',$tabla);
+        View::set('total_incapacidadesADG',$total_incapacidadesADG);
+        View::set('total_incapacidades', $total_incapacidades);
+        View::set('total_incapacidadesTrimestre', $total_incapacidadesTrimestre);
         View::set('header',$this->_contenedor->header($extraHeader));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("incapacidades_all");
@@ -238,8 +246,6 @@ html;
         {
             $this->alerta($id,'error');
         }
-
-
     }
 
     public function add(){

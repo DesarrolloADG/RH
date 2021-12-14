@@ -23,13 +23,13 @@
                                         <th>Curso</th>
                                         <th>Duración</th>
                                         <th>Cubrir</th>
-                                        <th>Expositor</th>
                                         <th><span class="glyphicon glyphicon-calendar" style="color:white"></span></th>
                                          <th>Planta</th>
                                         <th>Grupo</th>
                                         <th>Estatus</th>
                                         <th>Acciones</th>
                                         <th>Asistencia</th>
+                                        <th>Calificación</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -43,6 +43,48 @@
         </div>
     </div>
 
+</div>
+
+<div class="modal fade" id="Modal_Documentacion" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="form-group row" align="center">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading text-center">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                            </button>
+                            <span><strong><span class="fa fa-archive"></span> Asignar Calificación al Expositor</strong>
+                                                                                    </span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-12">
+
+                                <form enctype="multipart/form-data" id="form_colaboradores">
+
+                                    <input type="hidden" style="width:350px;" class="form-control" id="id_colaborador" name="id_colaborador">
+
+                                    <div class="form-group">
+                                        <label for="title">Asignar Calificación (0 - 100) *</label>
+                                        <input type="number" class="form-control" id="title" name="title" placeholder="100" style="text-transform:uppercase;" onkeyup="javascript:this.value=this.value.toUpperCase();" onInput="validarInput()">
+                                        <span id="availability1"></span>
+                                    </div>
+                                </form>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="submit" name="btn_Validar" id="btn_Validar"
+                                                class="btn btn-primary btn-block" onclick="onSubmitFormColaboradores()">Guardar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="modal fade Modal_Nuevo" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -91,5 +133,47 @@
         </div>
     </div>
 </div>
+<script>
+    function onSubmitFormColaboradores() {
+        var frm = document.getElementById('form_colaboradores');
+        var data = new FormData(frm);
+        var xhttp = new XMLHttpRequest();
+
+        $('#availability1').html('');
+
+        if(!document.getElementById("title").value.length)
+        {
+            console.log("Debes Asignar una Calificación");
+            $('#availability1').html('<span class="text-danger glyphicon glyphicon-remove"></span><span> Debes llenar el campo Título</span>');
+
+        }
+        else {
+                        $('#btn_Validar').attr("disabled", true);
+                        console.log("ya entre");
+                        xhttp.onreadystatechange = function () {
+                            if (this.readyState == 4) {
+                                var msg = xhttp.responseText;
+                                if (msg == 'success') {
+                                    //alert(msg);
+
+                                    alertify
+                                        .alert("Subido con Éxito", function(){
+                                        });
+                                    if($('#Modal_Documentacion').modal('hide'))
+                                    {
+                                        location.reload()
+                                    }
+
+                                } else {
+                                    alert(msg);
+                                }
+                            }
+                        };
+                        xhttp.open("POST", "/RegistroCapacitaciones/CalificacionAdd", true);
+                        xhttp.send(data);
+                        $('#form_colaboradores').trigger('reset');
+        }
+    }
+</script>
 
 <?php echo $footer; ?>

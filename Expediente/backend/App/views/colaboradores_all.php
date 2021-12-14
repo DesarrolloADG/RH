@@ -22,7 +22,7 @@
                                     <th>Nombre</th>
                                     <th>Empresa</th>
                                     <th>Departamento</th>
-                                    <th>Pago</th>
+                                    <th>Colaborador</th>
                                     <th>Identificador</th>
                                     <th>Acciones</th>
                                 </tr>

@@ -32,6 +32,30 @@ sql;
         return $mysqli->queryAll($query);
     }
 
+    public static function getTotalAccidentes(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT COUNT(*) AS total FROM accidentes WHERE YEAR(fecha_accidente) = DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 YEAR), '%Y')
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getTotalAccidentesADG(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT COUNT(*) AS total FROM accidentes
+sql;
+        return $mysqli->queryOne($query);
+    }
+
+    public static function getTotalAccidentesTrimestre(){
+        $mysqli = Database::getInstance();
+        $query=<<<sql
+     SELECT COUNT(*) AS total_trimestre FROM accidentes WHERE YEAR(fecha_accidente) = YEAR(CURDATE()) AND QUARTER(fecha_accidente) = QUARTER(CURDATE())
+sql;
+        return $mysqli->queryOne($query);
+    }
+
     public static function insert1($incapacidad, $id, $subsecuente){
         $mysqli = Database::getInstance();
         $query=<<<sql

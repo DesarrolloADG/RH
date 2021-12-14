@@ -32,7 +32,16 @@
                                                             <div class="form-group col-md-6">
                                                                 <label class="control-label col-md-4 col-sm-3 col-xs-12" for="nombre_expositor">Nombre del Expositor<span class="required">*</span></label>
                                                                 <div class="col-md-8 col-sm-6 col-xs-12">
-                                                                    <input type="textarea" name="nombre_expositor" id="nombre_expositor" class="form-control col-md-7 col-xs-12" placeholder="Nombre del Curso" value="<?php echo $registro['nombre_expositor']; ?>">
+                                                                    <input type="textarea" name="nombre_expositor" id="nombre_expositor" class="form-control col-md-7 col-xs-12" placeholder="Nombre del Curso" value="<?php
+                                                                    if($registro['nombre_expositor'] == '000')
+                                                                    {
+                                                                       echo "EXPOSITOR EXTERNO";
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        echo $nombre['nombre'];
+                                                                    }
+                                                                     ?>"disabled>
                                                                 </div>
                                                             </div>
 

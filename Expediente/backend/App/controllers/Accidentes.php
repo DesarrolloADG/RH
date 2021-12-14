@@ -101,6 +101,9 @@ html;
 html;
         }
 
+        $total_accidentes = AccidentesDao::getTotalAccidentes();
+        $total_accidentesADG = AccidentesDao::getTotalAccidentesADG();
+        $total_accidentesTrimestre = AccidentesDao::getTotalAccidentesTrimestre();
         $pdfHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 2)==1)?  "" : "style=\"display:none;\"";
         $excelHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 3)==1)? "" : "style=\"display:none;\"";
         $agregarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 4)==1)? "" : "style=\"display:none;\"";
@@ -110,6 +113,9 @@ html;
         View::set('editarHidden',$editarHidden);
         View::set('eliminarHidden',$eliminarHidden);
         View::set('tabla',$tabla);
+        View::set('total_accidentesADG',$total_accidentesADG);
+        View::set('total_accidentes', $total_accidentes);
+        View::set('total_accidentesTrimestre', $total_accidentesTrimestre);
         View::set('header',$this->_contenedor->header($extraHeader));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("accidentes_all");
@@ -402,7 +408,6 @@ html;
           $("#btnCancel").click(function(){
             window.location.href = "/Accidentes/";
           });//fin del btnAdd
-
         });//fin del document.ready
       </script>
 html;

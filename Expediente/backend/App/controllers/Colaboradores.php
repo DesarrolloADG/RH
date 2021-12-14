@@ -38,10 +38,18 @@ class Colaboradores extends Controller{
 
   public function getAllColaboradoresAsignados($perfil, $identificador, $planta, $departamento, $filtros){
     $html = "";
+    $personal = '';
     foreach (GeneralDao::getAllColaboradores($perfil, $identificador, $planta, $departamento, $filtros) as $key => $value) {
       $value['apellido_paterno'] = utf8_encode($value['apellido_paterno']); 
       $value['apellido_materno'] = utf8_encode($value['apellido_materno']); 
-      $value['nombre'] = utf8_encode($value['nombre']); 
+      $value['nombre'] = utf8_encode($value['nombre']);
+
+      if($value['pago'] == 'Semanal'){
+          $personal = 'PRODUCCIÓN';
+      }
+      else{
+          $personal = 'ADMINISTRATIVO';
+      }
 
       $value['identificador_noi'] = (!empty($value['identificador_noi'])) ? $value['identificador_noi'] : "SIN<br>IDENTIFICADOR";
       $html .=<<<html
@@ -55,7 +63,7 @@ class Colaboradores extends Controller{
           <td style="text-align:center; vertical-align:middle;"> {$value['apellido_paterno']} <br> {$value['apellido_materno']} <br> {$value['nombre']} </td>
           <td style="text-align:center; vertical-align:middle;"> {$value['nombre_empresa']} </td>
           <td style="text-align:center; vertical-align:middle;"> {$value['nombre_departamento']} </td>
-          <td style="text-align:center; vertical-align:middle;"> {$value['pago']} </td>
+          <td style="text-align:center; vertical-align:middle;"> $personal</td>
           <td style="text-align:center; vertical-align:middle;"> {$value['identificador_noi']} </td>
           <td style="text-align:center; vertical-align:middle;">
           <a href="/Colaboradores/show/{$value['catalogo_colaboradores_id']}" type="submit" name="id_empresa" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
@@ -864,8 +872,6 @@ html;
 html;
     }
 
-
-
         $otros_datos = ColaboradoresDao::getOtrosDatosPersonales($id);
     $editarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 5)==1)?  "" : "style=\"display:none;\"";
     $eliminarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 6)==1)? "" : "style=\"display:none;\"";
@@ -1030,6 +1036,30 @@ html;
 html;
     }
 
+        $AscensoUltimo = ColaboradoresDao::getAscensoAllUltimo($id);
+        $Prom = ColaboradoresDao::getPromedio($id);
+        $Promedio = '';
+        if(!empty($Prom['promedio']))
+        {
+            $Promedio.=<<<html
+                     {$Prom['promedio']} PUNTOS
+html;
+        }
+
+        $Prom_E = ColaboradoresDao::getPromedioE($id);
+        $Promedio_E = '';
+        if(!empty($Prom_E['promedio']))
+        {
+            $Promedio_E.=<<<html
+                <div class="form-group col-md-9">
+                <label>PROMEDIO GENERAL DE LAS EVALUACIONES CÓMO CAPACITADOR: </label>
+                {$Prom_E['promedio']} PUNTOS
+                </div>
+                     
+html;
+        }
+
+
         $Porcentaje = ColaboradoresDao::getPorcentajeAsistencia($id);
         $DatoPorcentaje = "";
 
@@ -1079,9 +1109,50 @@ html;
                     <td class="center">
                         <button class="btn btn-danger" type="button" id="button" onclick="eliminar_competencias($delete_competencia)"><span class="fa fa-trash" style="color:white"></button>
                     </td>
+                </tr> 
+html;
+        }
+
+        $tablaAscenso = "";
+
+        foreach (ColaboradoresDao::getAscensoAll($id) as $key => $value) {
+            $delete_ascenso = $value['id_ascenso'];
+            $estatus = "";
+            if($value['estatus'] == 1)
+            {
+                $estatus.=<<<html
+               <span class="bi bi-check-circle-fill fa-2x" style="color:#7DE300;"></span>
+html;
+            }
+            if($value['estatus'] == 2)
+            {
+                $estatus.=<<<html
+               <span class="fa fa-clock-o fa-2x" style="color:#e28743;"></span>
+html;
+            }
+            if($value['estatus'] == 3)
+            {
+                $estatus.=<<<html
+            <button type="button" class="btn btn-warning ver_archivo_personal" value="{$value['url']}"><span class="fa fa-toggle-on" style="color:white"></span></button>
+
+html;
+            }
+            $tablaAscenso.=<<<html
+                <tr>
+                    <td><input type="checkbox" name="borrar[]" value="{$value['id_ascenso']}"/></td>
+                    <td> {$value['puesto']} </td> 
+                    <td> {$value['fecha_registro']} </td> 
+                    <td> {$value['fecha_termino']} </td> 
+                    <td> $estatus</td> 
+                    <td> {$value['descripcion']} </td> 
+                    <td class="center">
+                        <button class="btn btn-danger" type="button" id="button" onclick="eliminar_competencias($delete_competencia)"><span class="fa fa-trash" style="color:white"></button>
+                    </td>
                 </tr>
 html;
         }
+
+
 
         foreach (ColaboradoresDao::getSueldos($id) as $key => $value) {
             $sueldo = '';
@@ -1181,17 +1252,114 @@ html;
                 }
 
             }
+            $calificacion_requiere = '';
+            if($value['requierecal'] == '1')
+            {
+                $calificacion_requiere.=<<<html
+               SI
+html;
+            }
+            else
+            {
+                $calificacion_requiere.=<<<html
+               NO
+html;
+            }
+
+            $cal = '';
+            if(!empty($value['calificacion']))
+            {
+                $cal = $value['calificacion'];
+            }
+            else
+            {
+                if($value['requierecal'] == '0')
+                {
+                    $cal = 'NO APLICA';
+                }
+                else
+                {
+                    if(empty($value['calificacion']))
+                    {
+                        $cal = 'NO SE CARGO';
+                    }
+                    else
+                    {
+                        $cal= $value['calificacion'];
+                    }
+                }
+            }
             $TablaCapacitaciones.=<<<html
                 <tr>
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_numero_hijos']}"/></td>
                     <td> {$value['nombre_curso']} </td>
                     <td> <span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha']} </td>
-                    <td>  $estatus_ </td>
-                    <td>  $asistencia_ </td>
+                    <td> $calificacion_requiere </td>
+                    <td> $estatus_ </td>
+                    <td> $asistencia_ </td>
+                    <td> $cal </td>
                 </tr>
 html;
         }
-      $id_colaborador_ = $id;
+
+      $EsCapacitador = ColaboradoresDao::getCapacitador($id);
+      $CapacitadorUltimaEvaluacion = ColaboradoresDao::getUltimaEvaluacion($id);
+
+        $ResultadoUltimaEvaluacion = '';
+        if($EsCapacitador['numero'] >= 1)
+        {
+            if($CapacitadorUltimaEvaluacion['calificacion'] = 0)
+            {
+                $ResultadoUltimaEvaluacion.=<<<html
+            <div class="form-group col-md-6">
+            <label>CALIFICACIÓN DE LA ULTIMA EVALUACIÓN CÓMO EXPOSITOR:</label>
+            <input type="text" class="form-control" id="resultado" value="ESTA CAPACITACIÓN NO TUVO EVALUACIÓN" disabled>
+            </div>
+html;
+            }
+            else
+            {
+                if(empty($CapacitadorUltimaEvaluacion['calificacion_expositor'])){
+                    $ResultadoUltimaEvaluacion.=<<<html
+            <div class="form-group col-md-12">
+            <label>CALIFICACIÓN DE LA ULTIMA EVALUACIÓN CÓMO EXPOSITOR:</label>
+            <input type="text" class="form-control" id="resultado" value="{$CapacitadorUltimaEvaluacion['fecha']} - ({$CapacitadorUltimaEvaluacion['nombre_curso']}) - FALTA CARGAR LA CALIFICACIÓN" disabled>
+            </div>
+html;
+                }
+                else{
+                    $ResultadoUltimaEvaluacion.=<<<html
+            <div class="form-group col-md-6">
+            <label>CALIFICACIÓN DE LA ULTIMA EVALUACIÓN CÓMO EXPOSITOR:</label>
+            <input type="text" class="form-control" id="resultado" value="{$CapacitadorUltimaEvaluacion['fecha']} - ({$CapacitadorUltimaEvaluacion['nombre_curso']}) - {$CapacitadorUltimaEvaluacion['calificacion_expositor']}" disabled>
+            </div>
+html;
+                }
+            }
+
+        }
+
+      $TieneReportes = ColaboradoresDao::getTieneReportes($id);
+        $repo = '';
+        if($TieneReportes['numero'] >= 1)
+        {
+            $repo = 'SI';
+        }
+        else{
+            $repo = 'NO';
+        }
+
+        $repor =  '';
+        $TieneReportesCuando = ColaboradoresDao::getUltimoReporte($id);
+        if(empty($TieneReportesCuando['fecha_alta']))
+        {
+            $repor =  'SIN REGISTRO';
+        }
+        else{
+            $repor =  $TieneReportesCuando['fecha_alta'].' ('.$TieneReportesCuando['descripcion'].')';
+        }
+
+        $id_colaborador_ = $id;
 
       View::set('sStatus',$sStatus);
       View::set('nombrePuesto',$nombrePuesto);
@@ -1200,11 +1368,18 @@ html;
       View::set('nombreUbicacion', $nombreUbicacion);
       View::set('nombreDepartamento', $nombreDepartamento);
       View::set('colaborador', $colaborador);
+      View::set('repor', $repor);
+      View::set('Promedio', $Promedio);
+      View::set('Promedio_E', $Promedio_E);
+      View::set('EsCapacitador', $EsCapacitador);
+      View::set('ResultadoUltimaEvaluacion', $ResultadoUltimaEvaluacion);
       View::set('ingreso_proyecto', $ingreso_proyecto);
       View::set('incentivo_trimestral', $incentivo_trimestral);
       View::set('id_colaborador', $id_colaborador);
+      View::set('AscensoUltimo', $AscensoUltimo);
       View::set('CuestionarioIngreso_', $CuestionarioIngreso_);
       View::set('id_colaborador_', $id_colaborador_);
+      View::set('repo', $repo);
       View::set('status', $statusNombre);
       View::set('tabla1', $tabla1);
       View::set('tabla2', $tabla2);
@@ -1213,6 +1388,7 @@ html;
       View::set('tabla1', $tabla1);
       View::set('tablaAccidentes', $tablaAccidentes);
       View::set('tablaCompetencias', $tablaCompetencias);
+      View::set('tablaAscenso', $tablaAscenso);
       View::set('AntiguedadPuestoActual', $AntiguedadPuestoActual);
       View::set('TablaCapacitaciones', $TablaCapacitaciones);
       View::set('tablaSueldo', $tablaSueldo);

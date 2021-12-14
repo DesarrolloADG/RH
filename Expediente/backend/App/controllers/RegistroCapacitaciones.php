@@ -68,6 +68,15 @@ class RegistroCapacitaciones extends Controller{
 
        
         });
+        
+         $(document).ready(function(){
+	$(document).on('click', '.upload', function(){
+		var id=$(this).val(); 
+		console.log('documento : ' + id ); 
+		$('#Modal_Documentacion').modal('show');
+        $('#id_colaborador').val(id);
+	});
+});
       </script>
 html;
         $usuario = $this->__usuario;
@@ -81,38 +90,72 @@ html;
             $estatus = "";
             if($fechamovimiento >= $value['fecha'])
             {
-                $estatus = 'Capacitación Finalizada';
+                $estatus = <<<html
+                        Capacitación Finalizada <span class="fa fa-check-circle" style="color:green">
+html;
                 $asistencia = <<<html
                         <a href="/RegistroCapacitaciones/Asistencia/{$value['id_capacitacion']}" {$editarHidden} type="submit" name="id" class="btn btn-warning"><span class="fa fa-check-circle" style="color:white"></span> </a>
 html;
             }
-            if($fechamovimiento <= $value['fecha']  )
+            if($fechamovimiento <= $value['fecha'])
             {
-                $estatus = 'Capacitación Pendiente';
+                $estatus = <<<html
+                        Capacitación Pendiente <span class="fa fa-clock-o" style="color:#ea7d10">
+html;
                 $asistencia = <<<html
                         <a class="btn btn-warning" disabled><span class="fa fa-check-circle" style="color:white"></span> </a>
 html;
-
             }
+            $cal = "";
+            $acciones = "";
+            if($value['calificacion'] == '0')
+            {
+                $cal = <<<html
+                 <span class="bi bi-x-circle-fill fa-2x" style="color:#F73F35;"> </span>NO APLICA
+html;
+            }
+            if($value['calificacion'] == '1')
+            {
+                if($value['calificacion_expositor'] != 0) {
+                    $cal = $value['calificacion_expositor'].'/100 PUNTOS';
+                }
+                else {
+                    if ($fechamovimiento <= $value['fecha']) {
+                    $cal = <<<html
+                   <button type="button" class="btn btn-outline-dark upload" value="{$value['id_capacitacion']}" disabled><i class="bi bi-check-circle-fill" style="color:gray" aria-hidden="true"></i> Capacitador</button>
+html;
+                }
+                    else
+                    {
+                        $cal = <<<html
+                   <button type="button" class="btn btn-outline-dark upload" value="{$value['id_capacitacion']}"><i class="bi bi-check-circle-fill" style="color:gray" aria-hidden="true"></i> Capacitador</button>
+html;
+                    }
+                }
+            }
+
 
             $tabla.=<<<html
                 <tr>
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_capacitacion']}"/></td>
                     <td>{$value['nombre_curso']}</td>
-                    <td>{$value['duracion']} hora(s) de capacitación</td>
-                    <td>{$value['horas_cubrir']} hora(s) programadas</td>
-                    <td>{$value['nombre_expositor']}</td>
-                    <td>{$value['fecha']}</td>
+                    <td><span class="fa fa-clock-o" style="color:#00A5E3"></span>  {$value['duracion']} hora(s) de capacitación</td>
+                    <td><span class="fa fa-clock-o" style="color:#00A5E3"></span>  {$value['horas_cubrir']} hora(s) programadas</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha']}</td>
                     <td>{$value['planta']}</td>
                     <td>{$value['grupo']}</td>
-                    <td>$estatus</td>
+                    <td>$estatus</td>     
                     <td class="center" >
                         <a href="/RegistroCapacitaciones/Edit/{$value['id_capacitacion']}" {$editarHidden} type="submit" name="id" class="btn btn-primary"><span class="fa fa-pencil-square-o" style="color:white"></span> </a>
-                        <a href="/RegistroCapacitaciones/Show/{$value['id_capacitacion']}" type="submit" name="id_capacitacion" class="btn btn-success"><span class="glyphicon glyphicon-eye-open" style="color:white"></span> </a>
+                        <a href="/RegistroCapacitaciones/Edit/{$value['id_capacitacion']}" {$editarHidden} type="submit" name="id" class="btn btn-success"><span class="fa fa-print" style="color:white"></span> </a>
                         <a href="/RegistroCapacitaciones/Asistentes/{$value['id_capacitacion']}" type="submit" name="id_capacitacion" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign" style="color:white"></span> Asistente</a>
+                    
                     </td>
                     <td class="center" >
-                        $asistencia;
+                        $asistencia
+                    </td>
+                    <td class="center" >
+                        $cal
                     </td>
                 </tr>
 html;
@@ -130,6 +173,24 @@ html;
         View::set('header',$this->_contenedor->header($extraHeader));
         View::set('footer',$this->_contenedor->footer($extraFooter));
         View::render("registro_all");
+    }
+
+    public function CalificacionAdd(){
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $calificacion = $_POST['title'];
+            $idd = $_POST['id_colaborador'];
+
+            $id = RegistroDao::update_calificacion($calificacion, $idd);
+
+            if ($id) {
+                echo 'success';
+
+            } else {
+                echo 'fail';
+            }
+        } else {
+            echo 'fail';
+        }
     }
 
     public function getColaboradorNombre(){
@@ -162,14 +223,14 @@ html;
         return $idPuesto;
     }
 
-    public function getCalsificacionAccidente(){
-        $clasificacion = '';
-        foreach (RegistroDao::getClasificacionrAccidente() as $key => $value) {
-            $clasificacion .=<<<html
-        <option value="{$value['id_clasificacion_accidente']}">{$value['detalle']}</option>
+    public function getNombreExpositor(){
+        $idExpositor = '';
+        foreach (RegistroDao::getColaboradoresExpositor() as $key => $value) {
+            $idExpositor .=<<<html
+        <option value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
 html;
         }
-        return $clasificacion;
+        return $idExpositor;
     }
 
     public function Asistentes($id){
@@ -217,9 +278,9 @@ html;
                 <tr>
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_capacitaciones_asistentes']}"/></td>
                     <td>{$value['nombre']}</td>
-                    <td>{$value['fecha_alta']}</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha_alta']}</td>
                     <td>$planta</td>
-                    <td>{$value['puesto']}</td>
+                    <td><span class="fa fa-suitcase" style="color:#2A3F54"></span> {$value['puesto']}</td>
                      <td style="text-align:center; vertical-align:middle;">
                             <button class="btn btn-danger" type="button" id="button" onclick="gt_1($delete)"><span class="fa fa-trash" style="color:white"></button>
                       </td>
@@ -269,7 +330,6 @@ html;
         View::set('tabla',$tabla);
         View::set('contador',$contador);
         View::set('registro_id',$registro_id);
-        View::set('idClasificacion',$this->getCalsificacionAccidente());
         View::render("registro_participante");
     }
 
@@ -279,25 +339,25 @@ html;
         $(document).ready(function(){
           $("#add").validate({
             rules:{
-              nombre_colaborador:{
+              nom_cur:{
                 required: true
               },
-              fecha:{
+              duracion:{
                 required: true
               },
-              trimestre:{
+              horas:{
+                required: true
+              },
+              nom_exp:{
+                required: true
+              },
+	           fecha:{
                 required: true
               },
               lugar:{
                 required: true
               },
-	           clasificacion:{
-                required: true
-              },
-              detalle:{
-                required: true
-              },
-              causa:{
+              puestos:{
                 required: true
               },
               acto:{
@@ -305,34 +365,46 @@ html;
               },
               condicion:{
                 required: true
+              },
+              calificacion:{
+                required: true
+              },
+              puesto:{
+                required: true
               }
             },
             messages:{
-              nombre_colaborador:{
+              nom_cur:{
                 required: "Este campo es requerido"
               },
-             fecha:{
+             duracion:{
                 required: "Este campo es requerido"
               },
-              trimestre:{
+              horas:{
                 required: "Este campo es requerido"
               },
-               lugar:{
+               nom_exp:{
                 required: "Este campo es requerido"
               },
-              clasificacion:{
+              fecha:{
                 required: "Este campo es requerido"
               },
-              detalle:{
+              lugar:{
                 required: "Este campo es requerido"
               },
-               causa:{
+               puestos:{
                 required: "Este campo es requerido"
               },
               acto:{
                 required: "Este campo es requerido"
               },
 	            condicion:{
+                required: "Este campo es requerido"
+              },
+	            calificacion:{
+                required: "Este campo es requerido"
+              },
+              puesto:{
                 required: "Este campo es requerido"
               }
             }
@@ -349,10 +421,9 @@ html;
 
         View::set('header',$this->_contenedor->header(''));
         View::set('footer',$this->_contenedor->footer($extraFooter));
-        View::set('idColaborador',$this->getColaboradorNombre());
         View::set('idLugarPlanta',$this->getLugarPlanta());
         View::set('idPuesto',$this->getPuesto());
-        View::set('idClasificacion',$this->getCalsificacionAccidente());
+        View::set('idExpositor',$this->getNombreExpositor());
         View::render("registro_add");
     }
 
@@ -376,8 +447,10 @@ html;
 
     public function ParticipanteAddAsistencia(){
         $participante = MasterDom::getData('nombre_colaborador');
+        $calificacion = MasterDom::getData('calificacion');
 
-        $id = RegistroDao::AsistenciaParticipantesUpdate($participante);
+
+        $id = RegistroDao::AsistenciaParticipantesUpdate($participante,$calificacion);
         if ($id) {
             echo 'fail';
 
@@ -404,6 +477,7 @@ html;
         $registro->_puesto = MasterDom::getData('puesto');
         $registro->_duracion = MasterDom::getData('duracion');
         $registro->_horas = MasterDom::getData('horas');
+        $registro->_calificacion = MasterDom::getData('calificacion');
 
 
         $id = RegistroDao::insert($registro);
@@ -459,6 +533,23 @@ html;
 html;
         }
         $registro_id = RegistroDao::getAllID($id);
+
+        $calificacion_campo = "";
+        if($registro_id['calificacion'] == 1)
+        {
+            $calificacion_campo.=<<<html
+            <div class="form-group col-md-3">
+                                    <label class="control-label col-md-12" for="calificacion">Calificación de la Capcitación<span class="required"></span></label>
+                                    <div class="col-md-10">
+                                        <div class="form-group">
+                                            <input type="number" class="form-control" id="calificacion" name="calificacion" required>
+                                        </div>
+                                        <span id="availability_calificacion"></span>
+                                    </div>
+                                </div>
+html;
+        }
+
         $personal = RegistroDao::getAllPersonalAsistencias($id);
         $contador = RegistroDao::getContador($id);
         $contador_asistentes = RegistroDao::getContadorAsistentes($id);
@@ -514,8 +605,16 @@ html;
 
         $eliminarHidden = (Controller::getPermisosUsuario($usuario, "seccion_departamentos", 6)==1)? "" : "style=\"display:none;\"";
         $tabla= '';
+        $calif= '';
         foreach ($personal as $key => $value) {
-
+            if($registro_id['calificacion'] == 0)
+            {
+                $calif= 'NO APLICA';
+            }
+            else
+            {
+                $calif = $value['calificacion'];
+            }
             if($value['planta'] == '')
             {
                 $planta = 'ADMINISTRATIVOS';
@@ -529,9 +628,10 @@ html;
                 <tr>
                     <td><input type="checkbox" name="borrar[]" value="{$value['id_capacitaciones_asistentes']}"/></td>
                     <td>{$value['nombre']}</td>
-                    <td>{$value['fecha_alta']}</td>
-                    <td>$planta</td>
-                    <td>{$value['puesto']}</td>
+                    <td><span class="fa fa-calendar-check-o" style="color:rosybrown"></span> {$value['fecha_alta']}</td>
+                    <td>$planta</td> 
+                    <td><span class="fa fa-suitcase" style="color:#2A3F54"></span>  {$value['puesto']}</td>
+                    <td>$calif</td>
                      <td style="text-align:center; vertical-align:middle;">
                             <button class="btn btn-danger" type="button" id="button" onclick="gt_1($delete)"><span class="fa fa-trash" style="color:white"></button>
                       </td>
@@ -550,6 +650,7 @@ html;
         View::set('contador_asistentes',$contador_asistentes);
         View::set('horas_cubiertas',$horas_cubiertas);
         View::set('registro_id',$registro_id);
+        View::set('calificacion_campo',$calificacion_campo);
         View::render("asistencia_all");
     }
 
@@ -645,12 +746,15 @@ html;
 html;
         }
 
+        $nombre = RegistroDao::getAllIDNombre($id);
+
 
         View::set('registro',$registro);
         View::set('sLugarPlanta',$sLugarPlanta);
         View::set('sPuesto',$sPuesto);
         View::set('header',$this->_contenedor->header(''));
         View::set('footer',$this->_contenedor->footer($extraFooter));
+        View::set('nombre',$nombre);
         View::render("registro_edit");
     }
 
@@ -662,11 +766,6 @@ html;
         $nombre_curso = MasterDom::getDataAll("nombre_curso");
         $nombre_curso = MasterDom::procesoAcentosNormal(("$nombre_curso"));
         $registro->_nombre_curso = $nombre_curso;
-
-
-        $nombre_expositor = MasterDom::getDataAll("nombre_expositor");
-        $nombre_expositor = MasterDom::procesoAcentosNormal("$nombre_expositor");
-        $registro->_nombre_expositor = $nombre_expositor;
 
         $registro->_fecha = MasterDom::getData('fecha');
 
@@ -708,23 +807,9 @@ html;
         <option {$selected} value="{$value['catalogo_colaboradores_id']}">{$value['nombre']}</option>
 html;
         }
-        $sClasificacion = "";
-        foreach (AccidentesDao::getClasificacionrAccidente() as $key => $value) {
-            $selected = ($accidente['id_clasificacion_accidente']==$value['id_clasificacion_accidente'])? 'selected' : '';
-            $sClasificacion .=<<<html
-        <option {$selected} value="{$value['id_clasificacion_accidente']}">{$value['detalle']}</option>
-html;
-        }
-        $sLugar = "";
-        foreach (AccidentesDao::getLugarAccidente() as $key => $value) {
-            $selected = ($accidente['id_lugar_accidente']==$value['id_lugar_accidente'])? 'selected' : '';
-            $sLugar .=<<<html
-        <option {$selected} value="{$value['id_lugar_accidente']}">{$value['detalle']}</option>
-html;
-        }
+
 
         View::set('sColaborador',$sColaborador);
-        View::set('sClasificacion',$sClasificacion);
         View::set('sLugar',$sLugar);
         View::set('accidente',$accidente);
         View::set('header',$this->_contenedor->header(''));
